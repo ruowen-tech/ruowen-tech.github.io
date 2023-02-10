@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "count": 2,
+  "card": [
+    {"id": 1, "path": "san.json"},
+    {"id": 2, "path": ""}
+  ]
+}
