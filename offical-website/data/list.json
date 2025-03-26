@@ -10,11 +10,11 @@
     },
     {
         "name": "7Zip",
-        "description": "压缩软件,支持rar,zip格式。",
-        "platforms": "Windows, Mac, Linux",
-        "version": "最新版本",
-        "downloadLink": "https://www.7-zip.org/download.html",
+        "description": "7-Zip是一个开放源码的数据压缩程序，主要在Microsoft Windows操作系统，Unix-like的操作系统可以使用7-zip的移植版本p7zip。它提供命令行接口的程序与图形用户界面的程序，而且可以与资源管理器结合。",
+        "platforms": "Windows, Linux",
+        "version": "24.09",
+        "downloadLink": "https://www.7-zip.org/",
         "docsLink": "https://www.7-zip.org/support.html",
-        "image": "path/to/software2-thumbnail.jpg"
+        "image": "https://www.7-zip.org/7ziplogo.png"
     }
 ]

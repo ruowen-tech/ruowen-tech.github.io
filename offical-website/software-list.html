@@ -18,12 +18,11 @@
         }
         .software-list {
             margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
+            display: block; /* 改为块级元素 */
             justify-content: center;
         }
         .software-item {
-            margin: 20px;
+            margin: 20px auto; /* 竖向排列时，使用 auto 使其居中 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,6 +31,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
             padding: 15px; /* 内边距 */
             transition: transform 0.2s; /* 动画效果 */
+            width: 300px; /* 设置固定宽度 */
         }
         .software-item:hover {
             transform: scale(1.05); /* 悬停放大效果 */
