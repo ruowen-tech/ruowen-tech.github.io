@@ -26,33 +26,54 @@
         .software-item {
             margin: 20px auto; /* 竖向排列时，使用 auto 使其居中 */
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            align-items: center; /* 垂直居中对齐 */
             background-color: #fff; /* 软件项背景 */
             border-radius: 8px; /* 圆角 */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
             padding: 15px; /* 内边距 */
             transition: transform 0.2s; /* 动画效果 */
             width: 90%; /* 使用百分比宽度 */
-            max-width: 300px; /* 设置最大宽度 */
+            max-width: 600px; /* 设置最大宽度 */
         }
         .software-item:hover {
-            transform: scale(1.05); /* 悬停放大效果 */
+            transform: scale(1.02); /* 悬停放大效果 */
+        }
+        .software-item img {
+            width: 100%; /* 设置图片宽度为100% */
+            height: 100%; /* 设置图片高度为100% */
+            max-width: 80px; /* 设置图片最大宽度 */
+            max-height: 80px; /* 设置图片最大高度 */
+            object-fit: cover; /* 保持比例并填充 */
+            margin-right: 15px; /* 图片与文本之间的间距 */
+        }
+        .software-details {
+            text-align: left; /* 文本左对齐 */
+            flex-grow: 1; /* 使文本区域占据剩余空间 */
+        }
+        .platform-icons {
+            display: flex; /* 使用 flexbox 布局 */
+            margin-top: 5px; /* 图标与文本之间的间距 */
+        }
+        .platform-icons img {
+            width: 20px; /* 图标宽度 */
+            height: auto; /* 自适应高度 */
+            margin-right: 5px; /* 图标之间的间距 */
         }
         .btn-download, .btn-docs {
-            display: block;
+            display: inline-block; /* 并排显示 */
             margin-top: 10px;
             padding: 10px 15px;
-            border: none;
+            border: 1px solid #007bff; /* 边框颜色 */
             border-radius: 5px;
-            color: #fff;
-            background-color: #007bff; /* 按钮背景颜色 */
+            color: #007bff; /* 字体颜色 */
+            background-color: transparent; /* 背景透明 */
             text-decoration: none;
-            transition: background-color 0.3s; /* 按钮颜色变化 */
+            transition: background-color 0.3s, color 0.3s; /* 按钮颜色变化 */
             font-size: 16px; /* 按钮字体大小 */
         }
         .btn-download:hover, .btn-docs:hover {
-            background-color: #0056b3; /* 悬停时按钮颜色 */
+            background-color: #007bff; /* 悬停时按钮背景颜色 */
+            color: #fff; /* 悬停时字体颜色 */
         }
         .search-bar {
             margin: 20px;
@@ -70,6 +91,15 @@
             outline: none; /* 去掉默认轮廓 */
         }
 
+        /* 更新时间样式 */
+        .last-updated {
+            position: absolute; /* 绝对定位 */
+            top: 10px; /* 距离顶部10px */
+            right: 20px; /* 距离右侧20px */
+            font-size: 14px; /* 字体大小 */
+            color: #666; /* 字体颜色 */
+        }
+
         /* 媒体查询 */
         @media (max-width: 600px) {
             .software-item {
@@ -78,26 +108,61 @@
             .btn-download, .btn-docs {
                 font-size: 14px; /* 在小屏幕上减小按钮字体 */
             }
+            .software-item img {
+                max-width: 60px; /* 在小屏幕上减小图片宽度 */
+                max-height: 60px; /* 在小屏幕上减小图片高度 */
+            }
         }
     </style>
-    <title>软件列表</title>
+    <title id="page-title">软件列表</title>
 </head>
 <body>
     <div class="div">
-        <p>生活中的点点滴滴，我们用系统化的方法帮你管理，用最有效的手段去让你变得更懒，让机器变得更聪明，从而为人们的生活提供更优质的服务。</p>
-        <p>生活中的科学有你有我！</p>
+        <select id="language-selector">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+        </select>
+        <p id="description"></p>
+        <p id="subtitle"></p>
+        <p id="info"></p>
     </div>
 
+    <p class="last-updated" id="last-updated">更新时间: 2025-03-26</p>
+
     <div class="search-bar">
-        <input type="text" id="search" placeholder="搜索软件名称..." onkeyup="filterSoftware()">
+        <input type="text" id="search" placeholder="" onkeyup="filterSoftware()">
     </div>
 
     <div class="software-list" id="softwareList">
-        <h2>软件列表</h2>
+        <h2 id="software-list-title">软件列表</h2>
         <!-- 软件项将通过 JavaScript 动态生成 -->
     </div>
 
     <script>
+        let currentLanguage = 'zh'; // 默认语言
+
+        function loadLanguage(lang) {
+            fetch(`data/${lang}.json`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('page-title').innerText = data.title;
+                    document.getElementById('description').innerText = data.description;
+                    document.getElementById('subtitle').innerText = data.subtitle;
+                    document.getElementById('info').innerText = data.info;
+                    document.getElementById('search').placeholder = data.search_placeholder;
+                    document.getElementById('software-list-title').innerText = data.title;
+                });
+        }
+
+        document.getElementById('language-selector').addEventListener('change', function() {
+            currentLanguage = this.value;
+            loadLanguage(currentLanguage);
+        });
+
+        // 初始加载
+        loadLanguage(currentLanguage);
+
         // 从 JSON 文件加载软件列表
         fetch('data/list.json')
             .then(response => response.json())
@@ -108,12 +173,16 @@
                     softwareItem.className = 'software-item';
                     softwareItem.innerHTML = `
                         <img src="${software.image}" alt="${software.name}缩略图">
-                        <h3>${software.name}</h3>
-                        <p>${software.description}</p>
-                        <p>${software.platforms}</p>
-                        <p>当前版本: ${software.version}</p>
-                        <a href="${software.downloadLink}" class="btn-download">下载</a>
-                        <a href="${software.docsLink}" class="btn-docs">文档</a>
+                        <div class="software-details">
+                            <h3>${software.name}</h3>
+                            <p>${software.description}</p>
+                            <div class="platform-icons">
+                                ${software.platforms.map(platform => `<img src="${platform.icon}" alt="${platform.name}图标">`).join('')}
+                            </div>
+                            <p id="current-version">当前版本: ${software.version}</p>
+                            <a href="${software.downloadLink}" class="btn-download">下载</a>
+                            <a href="${software.docsLink}" class="btn-docs">文档</a>
+                        </div>
                     `;
                     softwareList.appendChild(softwareItem);
                 });

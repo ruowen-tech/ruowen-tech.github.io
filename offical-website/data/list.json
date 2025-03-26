@@ -1,8 +1,12 @@
 [
     {
         "name": "Blender",
-        "description": "开源的3D创作套件。",
-        "platforms": "Windows, Mac, Linux",
+        "description": "Blender是一款自由和开源的三维计算机图形软件，它可以用于创建和渲染三维模型、动画、游戏、视觉效果等。",
+        "platforms": [
+            {"name": "Windows", "icon": "img/windows-icon.png"},
+            {"name": "Mac", "icon": "img/macos-icon.png"},
+            {"name": "Linux", "icon": "img/linux-icon.png"}
+        ],
         "version": "4.4",
         "downloadLink": "https://www.blender.org/download/",
         "docsLink": "https://www.blender.org/support/",
@@ -11,10 +15,51 @@
     {
         "name": "7Zip",
         "description": "7-Zip是一个开放源码的数据压缩程序，主要在Microsoft Windows操作系统，Unix-like的操作系统可以使用7-zip的移植版本p7zip。它提供命令行接口的程序与图形用户界面的程序，而且可以与资源管理器结合。",
-        "platforms": "Windows, Linux",
+        "platforms": [
+            {"name": "Windows", "icon": "img/windows-icon.png"},
+            {"name": "Linux", "icon": "img/linux-icon.png"}
+        ],
         "version": "24.09",
         "downloadLink": "https://www.7-zip.org/",
         "docsLink": "https://www.7-zip.org/support.html",
         "image": "https://www.7-zip.org/7ziplogo.png"
+    },
+    {
+        "name":"Keka",
+        "description":"the macOS file archiver Store more, share with privacy",
+        "platforms":[
+            {"name": "Mac", "icon":"img/macos-icon.png"}
+        ],
+        "version":"1.4.8",
+        "downloadLink":"https://www.keka.io/en/",
+        "docsLink":"https://github.com/aonez/Keka/wiki",
+        "image":"https://www.keka.io/img/Keka-Square-512x512.png"
+
+    },
+    {
+        "name":"Gimp",
+        "description":"GIMP是一个自由及开放源代码的位图图像编辑器，用于图像照片润饰及编辑、自由绘图、调整大小、裁剪、照片蒙太奇、转换图像格式以及其他专业任务。 GIMP始于1995年，使用GPLv3+，可运行于GNU/Linux、MS Windows、macOS等平台，其原生文件格式的扩展名是.xcf。",
+        "platforms":[
+            {"name":"Windows", "icon":"img/windows-icon.png"},
+            {"name": "Mac", "icon": "img/macos-icon.png"},
+            {"name": "Linux", "icon": "img/linux-icon.png"}
+        ],
+        "version":"3.0.2",
+        "downloadLink":"https://www.gimp.org/downloads/",
+        "docsLink":"https://www.gimp.org/docs/",
+        "image":"img/gimp.png"
+    },
+    {
+        "name":"Audacity",
+        "description":"Audacity是一款跨平台的音频编辑软件，用于录音和编辑音频，是自由、开放源代码的软件，并根据GPLv2+授权条款分发。可在macOS、Microsoft Windows、Linux和其它操作系统上运作。",
+        "platforms":[
+            {"name":"Windows", "icon":"img/windows-icon.png"},
+            {"name": "Mac", "icon": "img/macos-icon.png"},
+            {"name": "Linux", "icon": "img/linux-icon.png"}
+        ],
+        "version":"3.7.3",
+        "downloadLink":"https://www.audacityteam.org/download/",
+        "docsLink":"https://support.audacityteam.org/",
+        "image":"img/audacity.svg"
     }
 ]
