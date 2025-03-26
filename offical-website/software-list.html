@@ -3,11 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { text-align: center; }
-        .div { margin: 0 auto; }
-        .software-list { margin-top: 20px; }
-        .software-item { margin: 20px; display: inline-block; }
-        .btn-download, .btn-docs { display: block; margin-top: 10px; }
+        body {
+            text-align: center;
+            background-color: #f4f4f4; /* 背景颜色 */
+            font-family: Arial, sans-serif; /* 字体样式 */
+            color: #333; /* 字体颜色 */
+        }
+        .div {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff; /* 内容背景 */
+            border-radius: 8px; /* 圆角 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
+        }
+        .software-list {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .software-item {
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff; /* 软件项背景 */
+            border-radius: 8px; /* 圆角 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
+            padding: 15px; /* 内边距 */
+            transition: transform 0.2s; /* 动画效果 */
+        }
+        .software-item:hover {
+            transform: scale(1.05); /* 悬停放大效果 */
+        }
+        .btn-download, .btn-docs {
+            display: block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            background-color: #007bff; /* 按钮背景颜色 */
+            text-decoration: none;
+            transition: background-color 0.3s; /* 按钮颜色变化 */
+        }
+        .btn-download:hover, .btn-docs:hover {
+            background-color: #0056b3; /* 悬停时按钮颜色 */
+        }
+        .search-bar {
+            margin: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px; /* 输入框宽度 */
+            transition: border-color 0.3s; /* 输入框边框变化 */
+        }
+        input[type="text"]:focus {
+            border-color: #007bff; /* 聚焦时边框颜色 */
+            outline: none; /* 去掉默认轮廓 */
+        }
     </style>
     <title>软件列表</title>
 </head>
@@ -17,26 +73,52 @@
         <p>生活中的科学有你有我！</p>
     </div>
 
-    <div class="software-list">
-        <h2>软件列表</h2>
-        <div class="software-item">
-            <img src="https://www.blender.org/" alt="软件1缩略图">
-            <h3>Blender</h3>
-            <p>软件1的简要介绍...</p>
-            <p>Windows, Mac, Linux</p>
-            <a href="https://www.blender.org/download/" class="btn-download">下载</a>
-            <a href="https://www.blender.org/support/l" class="btn-docs">文档</a>
-        </div>
-        <div class="software-item">
-            <img src="path/to/software2-thumbnail.jpg" alt="软件2缩略图">
-            <h3>7Zip</h3><!-- 软件名称-->
-            <p>压缩软件,rar,zip</p><!-- 软件描述 -->
-            <p>Windows, Mac, Linux</p><!-- 适用的系统 -->
-            <a href="https://www.software2.com/download" class="btn-download">下载</a>
-            <a href="docs/software2.html" class="btn-docs">文档</a>
-        </div>
-        <!-- 可以继续添加更多软件项 -->
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="搜索软件名称..." onkeyup="filterSoftware()">
     </div>
 
+    <div class="software-list" id="softwareList">
+        <h2>软件列表</h2>
+        <!-- 软件项将通过 JavaScript 动态生成 -->
+    </div>
+
+    <script>
+        // 从 JSON 文件加载软件列表
+        fetch('data/list.json')
+            .then(response => response.json())
+            .then(data => {
+                const softwareList = document.getElementById('softwareList');
+                data.forEach(software => {
+                    const softwareItem = document.createElement('div');
+                    softwareItem.className = 'software-item';
+                    softwareItem.innerHTML = `
+                        <img src="${software.image}" alt="${software.name}缩略图">
+                        <h3>${software.name}</h3>
+                        <p>${software.description}</p>
+                        <p>${software.platforms}</p>
+                        <p>当前版本: ${software.version}</p>
+                        <a href="${software.downloadLink}" class="btn-download">下载</a>
+                        <a href="${software.docsLink}" class="btn-docs">文档</a>
+                    `;
+                    softwareList.appendChild(softwareItem);
+                });
+            })
+            .catch(error => console.error('Error loading the software list:', error));
+
+        function filterSoftware() {
+            const input = document.getElementById('search');
+            const filter = input.value.toLowerCase();
+            const softwareList = document.getElementById('softwareList');
+            const items = softwareList.getElementsByClassName('software-item');
+
+            for (let i = 0; i < items.length; i++) {
+                const title = items[i].getElementsByTagName('h3')[0];
+                if (title) {
+                    const txtValue = title.textContent || title.innerText;
+                    items[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+                }
+            }
+        }
+    </script>
 </body>
 </html> 

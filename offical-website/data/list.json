@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Blender",
+        "description": "开源的3D创作套件。",
+        "platforms": "Windows, Mac, Linux",
+        "version": "4.4",
+        "downloadLink": "https://www.blender.org/download/",
+        "docsLink": "https://www.blender.org/support/",
+        "image": "img/blender.svg"
+    },
+    {
+        "name": "7Zip",
+        "description": "压缩软件,支持rar,zip格式。",
+        "platforms": "Windows, Mac, Linux",
+        "version": "最新版本",
+        "downloadLink": "https://www.7-zip.org/download.html",
+        "docsLink": "https://www.7-zip.org/support.html",
+        "image": "path/to/software2-thumbnail.jpg"
+    }
+]
