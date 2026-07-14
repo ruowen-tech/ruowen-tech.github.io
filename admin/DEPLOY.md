@@ -34,7 +34,7 @@ content/news.json  ←→  content/jobs.json
 | `GITHUB_CLIENT_ID` | OAuth App 公开的 Client ID | 设为 Worker 的 Secret |
 | `GITHUB_CLIENT_SECRET` | OAuth App 的 Secret（敏感） | 设为 Worker 的 Secret（**不要写进代码**） |
 | Cloudflare 账号 | 托管 Worker（免费层） | 部署 OAuth 代理 |
-| Worker 地址 | 形如 `https://ruowen-decap-proxy.<子域>.workers.dev` | 回填到 `config.yml` 的 `base_url` |
+| Worker 地址 | 生产用自定义域名 `https://decap.wonderingwall.com`（国内直连）；Cloudflare 部署时给的 `*.workers.dev` 仅用于验证，**国内常被墙，不能当生产地址** | 回填到 `config.yml` 的 `base_url` |
 
 ---
 
@@ -62,7 +62,7 @@ content/news.json  ←→  content/jobs.json
 |------|--------|
 | Application name | `若紊科技 Decap CMS`（随意） |
 | Homepage URL | `https://www.wonderingwall.com` |
-| Authorization callback URL | `https://ruowen-decap-proxy.spt-genius.workers.dev/callback`（**必须带 `/callback` 完整路径**，否则登录报 `redirect_uri_mismatch`） |
+| Authorization callback URL | `https://decap.wonderingwall.com/callback`（**必须带 `/callback` 完整路径**，否则登录报 `redirect_uri_mismatch`） |
 | Description | 可选，如 `Decap CMS 登录代理` |
 
 5. 点 **Register application**
@@ -135,7 +135,25 @@ https://ruowen-decap-proxy.<你的子域>.workers.dev
 ```
 记下这个地址（含 `https://`）。
 
-> 可选：若想用自定义域名，编辑 `wrangler.toml` 取消注释 `routes` 那行并改成你的子域；同时把 OAuth App 的回调地址同步改为该域名下的 `/callback`。
+### 3.5 把域名 NS 迁到 Cloudflare（国内直连的前提）
+
+`*.workers.dev` 在国内常被墙，Decap 弹窗加载不了会直接空白。必须把 OAuth 代理放到国内能直连的 `wonderingwall.com` 之下。
+
+1. Cloudflare 控制台 → **Add a site** → 输入 `wonderingwall.com` → 选 **Free**。
+2. Cloudflare 会自动扫描现有 DNS 记录（来自阿里云），确认包含：
+   - `www` → `CNAME` → `ruowen-tech.github.io`（站点仍在 GitHub Pages，**不要删**）
+   - 其它原本在阿里云设的记录照原样保留
+3. Cloudflare 会给出两组 NS（形如 `xxx.ns.cloudflare.com` / `yyy.ns.cloudflare.com`）。
+4. 去**阿里云 DNS 控制台**，把 `wonderingwall.com` 的 NS 记录改成 Cloudflare 给的两组。
+5. 等待生效（通常几分钟～几小时）。期间站点可能短暂抖动，属正常。
+6. 回到 Cloudflare，确保 `www → ruowen-tech.github.io` 这一条是 **Proxied（橙云）** 状态。
+
+### 3.6 给 Worker 绑自定义域名 decap.wonderingwall.com
+
+1. Cloudflare 控制台 → **Workers & Pages** → `ruowen-decap-proxy` → **Settings** → **Triggers** → **Custom Domains** → **Add Custom Domain**。
+2. 填 `decap.wonderingwall.com`，按提示确认（Cloudflare 自动加 CNAME + 签发证书）。
+3. 验证：浏览器打开 `https://decap.wonderingwall.com/` 应 302 跳到 GitHub 登录页（翻墙/直连能开即可，说明代理已挂上自定义域名）。
+4. 同步把 **GitHub OAuth App** 的 *Authorization callback URL* 改为 `https://decap.wonderingwall.com/callback`（见第 2 步表格）。
 
 ---
 
@@ -148,7 +166,7 @@ backend:
   name: github
   repo: ruowen-tech/ruowen-tech.github.io
   branch: master          # GitHub Pages 发布源是 master（<user>.github.io 仓库只从 master 发布）
-  base_url: https://ruowen-decap-proxy.spt-genius.workers.dev   # ← 已部署的真实 Worker 地址
+  base_url: https://decap.wonderingwall.com   # ← 生产用自定义域名（国内直连，见 3.5 / 3.6）
   auth_endpoint: auth
   site_url: https://www.wonderingwall.com
 ```
@@ -187,6 +205,7 @@ git push origin master
 | 现象 | 原因 / 处理 |
 |------|------------|
 | 后台打开但点登录无反应 / 报错 | `config.yml` 的 `base_url` 未改成真实 Worker 地址；或 Worker 未部署 |
+| 点登录弹出**空白页、不跳转**（国内直连） | `*.workers.dev` 在国内被墙，Decap 弹窗加载不了该地址。必须用自定义域名 `decap.wonderingwall.com`（见 3.5 / 3.6），且 OAuth App 回调与 config.yml `base_url` 都已指向该域名 |
 | 跳转 GitHub 后报 `redirect_uri_mismatch` | OAuth App 的 **Authorization callback URL** 必须是 `<base_url>/callback` 完整路径（含 `/callback`）。裸域名会 mismatch。去 OAuth App 设置里改一致 |
 | 授权后回弹窗报 `State mismatch` | 浏览器拦截了 Cookie / 跨站限制。确认 Worker 与站点均走 https，且未开过度严格的隐私拦截 |
 | 登录成功但保存时报 404 / 无权限 | 登录的 GitHub 账号对该仓库无**写权限**；或 `branch` 写错（见第 4 步分支注意，应为 `master`） |
