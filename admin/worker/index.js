@@ -3,7 +3,7 @@
 // 零依赖，可直接部署到 Cloudflare Workers 免费层。
 //
 // 协议（Decap github 后端要求）：
-//   1. 后台弹窗打开 <base_url>/auth
+//   1. 后台弹窗打开 <base_url>/auth（部分版本直接打开 <base_url> 根路径）
 //   2. 本 Worker 把浏览器 302 重定向到 GitHub 授权页
 //   3. GitHub 回调 <base_url>/callback?code=...&state=...
 //   4. 本 Worker 用 code 换取 access_token，再以 postMessage 把 token 回传给后台弹窗
@@ -11,15 +11,18 @@
 // 部署需要两个 Secret（不要写进代码）：
 //   GITHUB_CLIENT_ID     - GitHub OAuth App 的 Client ID
 //   GITHUB_CLIENT_SECRET - GitHub OAuth App 的 Client Secret
-// 见 wrangler.toml 与 README 步骤。
+// 见 wrangler.toml 与 ../DEPLOY.md 步骤。
 // =========================================================
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // 归一化路径：去掉尾部斜杠，根路径记为 "/"
+    const path = url.pathname.replace(/\/+$/, "") || "/";
+    console.log("[oauth] path=", url.pathname, "-> normalized:", path);
 
-    // ---- 路由 1：登录入口，重定向到 GitHub 授权页 ----
-    if (url.pathname === "/auth") {
+    // ---- 路由 1：登录入口（根路径 / /auth / /auth/ 都重定向到 GitHub 授权页）----
+    if (path === "/" || path === "/auth") {
       const state = crypto.randomUUID();
       const redirectUri = `${url.origin}/callback`;
       const githubAuthUrl =
@@ -28,6 +31,7 @@ export default {
         `&redirect_uri=${encodeURIComponent(redirectUri)}` +
         "&scope=public_repo" +
         `&state=${state}`;
+      console.log("[oauth] redirect -> github, redirect_uri=", redirectUri);
       return new Response("Redirecting to GitHub...", {
         status: 302,
         headers: {
@@ -39,7 +43,7 @@ export default {
     }
 
     // ---- 路由 2：OAuth 回调，换 token 并回传后台 ----
-    if (url.pathname === "/callback") {
+    if (path === "/callback") {
       const code = url.searchParams.get("code");
       const returnedState = url.searchParams.get("state");
       const cookies = request.headers.get("Cookie") || "";
@@ -96,7 +100,11 @@ export default {
       });
     }
 
-    // ---- 健康检查 ----
-    return new Response("Decap OAuth proxy is running.", { status: 200 });
+    // ---- 健康检查（移动到了 /healthz，避免与登录入口冲突）----
+    if (path === "/healthz") {
+      return new Response("Decap OAuth proxy is running.", { status: 200 });
+    }
+
+    return new Response("Not found", { status: 404 });
   },
 };
