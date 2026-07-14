@@ -3,15 +3,16 @@
    - 读取 localStorage 中的语言偏好（默认 zh）
    - 加载 assets/data/{lang}.json（路径可由 window.RW_I18N_BASE 覆盖，子目录页面用）
    - 翻译所有 [data-i18n] / [data-i18n-html] / [data-i18n-placeholder]
-   - 在 #langSwitch 中渲染语言选择器，并记忆选择
+   - 在页尾 #langSwitch（<select>）中渲染语言选择器，并记忆选择
    - 语言切换后派发 window 事件 "i18n:ready"，供动态渲染脚本（新闻/招聘/软件）重新渲染
    ========================================================= */
 (function () {
   "use strict";
 
+  // 支持的语言（单一数据源）：新增语言只需在此追加一项，并新建 assets/data/{code}.json
   var LANGS = [
     { code: "zh", label: "中文" },
-    { code: "en", label: "EN" },
+    { code: "en", label: "English" },
     { code: "ja", label: "日本語" }
   ];
   var STORAGE_KEY = "rw_lang";
@@ -48,15 +49,9 @@
       var val = resolve(dict, el.getAttribute("data-i18n-placeholder"));
       if (val != null) el.setAttribute("placeholder", val);
     });
-    // 同步选择器高亮
+    // 同步下拉选择器当前值
     var sel = document.getElementById("langSwitch");
-    if (sel) {
-      sel.querySelectorAll("[data-lang]").forEach(function (b) {
-        var on = b.getAttribute("data-lang") === current;
-        b.classList.toggle("active", on);
-        b.setAttribute("aria-pressed", on ? "true" : "false");
-      });
-    }
+    if (sel) sel.value = current;
     document.documentElement.setAttribute("lang", HTML_LANG[current] || current);
   }
 
@@ -81,17 +76,15 @@
     });
   }
 
+  // 在 #langSwitch（页尾下拉框）中渲染语言选项；由 LANGS 驱动，天然支持扩充
   function renderSelector() {
     var sel = document.getElementById("langSwitch");
     if (!sel) return;
     sel.innerHTML = LANGS.map(function (l) {
-      var on = l.code === current;
-      return '<button type="button" data-lang="' + l.code + '" class="' + (on ? "active" : "") +
-        '" aria-pressed="' + (on ? "true" : "false") + '">' + l.label + "</button>";
+      return '<option value="' + l.code + '">' + l.label + "</option>";
     }).join("");
-    sel.querySelectorAll("[data-lang]").forEach(function (b) {
-      b.addEventListener("click", function () { setLang(b.getAttribute("data-lang")); });
-    });
+    sel.value = current;
+    sel.addEventListener("change", function () { setLang(sel.value); });
   }
 
   // 供动态渲染脚本调用

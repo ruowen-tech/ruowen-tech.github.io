@@ -159,16 +159,22 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .nav__links a.active::after { transform: scaleX(1); }
 .nav__cta { margin-left: 8px; }
 
-/* Language switcher */
-.nav__lang { display: inline-flex; align-items: center; gap: 2px; margin-left: 10px; padding: 3px;
-  border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.06); }
-.nav.scrolled .nav__lang { border-color: var(--slate-200); background: var(--bg-soft); }
-.nav__lang button { border: none; background: transparent; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600;
-  color: rgba(255,255,255,.7); padding: 5px 10px; border-radius: 999px; transition: .2s var(--ease); }
-.nav.scrolled .nav__lang button { color: var(--slate-600); }
-.nav__lang button:hover { color: #fff; }
-.nav.scrolled .nav__lang button:hover { color: var(--accent); }
-.nav__lang button.active { background: var(--accent-grad); color: #fff; box-shadow: 0 6px 16px -8px rgba(47,107,255,.7); }
+/* Language selector (footer) */
+.footer__util { display: flex; align-items: center; gap: 18px; }
+.footer__lang { display: inline-flex; align-items: center; gap: 8px; }
+.footer__lang label { font-size: 13.5px; color: rgba(255,255,255,.6); user-select: none; }
+.lang-select {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  font: inherit; font-size: 13.5px; font-weight: 600; color: #fff;
+  background-color: rgba(255,255,255,.08);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
+  padding: 8px 34px 8px 16px; cursor: pointer; transition: .2s var(--ease);
+}
+.lang-select:hover { border-color: rgba(255,255,255,.4); background-color: rgba(255,255,255,.14); }
+.lang-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47,107,255,.35); }
+.lang-select option { color: #0b0f17; background: #fff; }
 
 .nav__toggle { display: none; width: 44px; height: 44px; border: none; background: transparent;
   cursor: pointer; position: relative; }
@@ -414,6 +420,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   .grid--3, .grid--2, .grid--4, .value-grid, .process, .prod-grid, .mission-grid, .statband { grid-template-columns: 1fr; }
   .footer__top { grid-template-columns: 1fr; }
   .footer__bottom { flex-direction: column; align-items: flex-start; }
+  .footer__util { flex-wrap: wrap; gap: 12px; }
   .field.row2 { grid-template-columns: 1fr; }
   .hero__stats { gap: 28px; }
 }
