@@ -126,21 +126,23 @@ npx wrangler secret put GITHUB_CLIENT_SECRET
 
 ### 3.3b 联系表单发信（Resend，免费档 3000/月）
 
-「提交咨询」表单由 `https://decap.wonderingwall.com/api/contact`（同一 Worker）经 Resend 发出，API Key 存为 Secret，不进前端。
+「提交咨询」表单由 `https://decap.wonderingwall.com/api/contact`（同一 Worker）经 Resend 发出，API Key 存为 Secret，不进前端。已注册好 Resend 账号后，从**验证域名**开始：
 
-1. 注册 [Resend](https://resend.com/) 免费账号（3000 封/月、100 封/天、无需信用卡）。
-2. **Domains → Add Domain → `wonderingwall.com`**，按提示在 **Cloudflare DNS** 添加 Resend 给的 SPF / DKIM / DMARC（TXT）记录，等状态变 **Verified**。
-3. **API Keys → Create Key**，复制 `re_...`。
-4. 在本地 `admin/worker` 目录执行（值只在提示后粘贴）：
+1. **Resend → Domains → Add Domain → `wonderingwall.com`**（Region 选 **Asia Pacific**）。提交后 Resend 会列出要加的 DNS 记录（通常 1 条 SPF + 2 条 DKIM，均为 TXT；DMARC 可选）。
+2. **去 Cloudflare（`wonderingwall.com` → DNS → Records）逐条添加这些 TXT 记录。**
+   ⚠️ **SPF 冲突坑**：若 Cloudflare Email Routing 已在根域 `wonderingwall.com` 放了一条 SPF（`v=spf1 include:_spf.mx.cloudflare.net ~all`），**不要新增第二条 SPF**，而要把 Resend 的 `include:amazonses.com` **合并进同一条**，例如：
+   `v=spf1 include:_spf.mx.cloudflare.net include:amazonses.com ~all`
+   （一个域名只能有一条 SPF TXT，多条会导致校验失败、邮件被拒。）
+3. **回 Resend → Domains 点该域的 Verify**，等状态变 **Verified**（若失败，是 DNS 全球生效需 10~30 分钟，稍后再点）。验证通过后，该域下任意前缀（如 `contact@`）自动获得发信权限，无需单独创建邮箱。
+4. **⚠️ 关闭 Sandbox Mode（极易漏）**：Resend 免费版默认开启沙盒，只允许发往你注册 Resend 的邮箱。去 **Settings → General → 关闭 Sandbox Mode**，否则联系表单发往 `contact@wonderingwall.com` 会被弹回（Bounced）。域名验证通过后即可关闭。
+5. **API Keys → Create Key**，复制 `re_...` 开头的密钥（只显示一次）。
+6. 本地 `admin/worker` 目录执行（值只在提示后粘贴）：
    ```bash
    npx wrangler secret put RESEND_API_KEY
+   npx wrangler deploy      # 让 Secret 生效（OAuth 两个 secret 不受影响）
    ```
-5. 重新部署使 Secret 生效（OAuth 两个 secret 不受影响）：
-   ```bash
-   npx wrangler deploy
-   ```
-6. 前端 `contact.html` 提交表单 → 应显示"提交成功"，`contact@wonderingwall.com`（→ 个人邮箱）收到咨询邮件，`reply_to` 为访客邮箱。
-7. 排查：Worker 日志 `wrangler tail` 看 `[contact]` 前缀；Resend 后台看发送记录与退回原因。
+7. 打开 `https://www.wonderingwall.com/contact.html` 实测：提交应显示"提交成功"，你的个人邮箱收到来自 `contact@wonderingwall.com` 的咨询邮件，`reply_to` 为访客邮箱。
+8. 排查：Resend 后台 **Logs** 看发送结果（最准）；Worker 侧 `wrangler tail` 看 `[contact]` 日志（国内可能连不上 tail，可跳过，以 Resend Logs 为准）。
 
 ### 3.4 部署
 
