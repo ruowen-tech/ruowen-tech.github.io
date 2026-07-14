@@ -36,7 +36,7 @@
             '<div class="job__detail-inner">' +
               "<h4>岗位职责</h4><p>" + U.esc(j.desc || "") + "</p>" +
               (reqs ? "<h4>任职要求</h4><ul>" + reqs + "</ul>" : "") +
-              '<div class="job__apply"><a class="btn btn--primary btn--sm" href="mailto:hr@ruowen-tech.com?subject=' +
+              '<div class="job__apply"><a class="btn btn--primary btn--sm" href="mailto:hr@wonderingwall.com?subject=' +
                 encodeURIComponent("应聘：" + j.title) + '">投递简历</a></div>' +
             "</div>" +
           "</div>" +
