@@ -1,0 +1,11 @@
+# Cloudflare Worker 配置：Decap CMS GitHub OAuth 代理
+# 部署：在 admin/worker/ 目录执行 `npx wrangler deploy`
+# 密钥（不要提交）：`npx wrangler secret put GITHUB_CLIENT_ID` 与 `GITHUB_CLIENT_SECRET`
+
+name = "ruowen-decap-proxy"
+main = "index.js"
+compatibility_date = "2024-09-23"
+
+# 可选：绑定自定义域名（推荐，便于 OAuth App 与 Pages 共用干净域名）
+# 取消注释并改成你的子域；同时要把 GitHub OAuth App 的回调地址同步改为该域名
+# routes = [{ pattern = "decap.yourdomain.com", custom_domain = true }]
