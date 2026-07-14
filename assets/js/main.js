@@ -81,6 +81,8 @@
   if (form) {
     const status = document.getElementById("formStatus");
     const submitBtn = form.querySelector('button[type="submit"]');
+    // 多语言回退：优先用 i18n 字典，未加载时回退中文
+    const T = (k, fb) => (window.I18N && window.I18N.t(k)) || fb;
     // 后端发信地址：我们自己的 Cloudflare Worker（自定义域名 decap.wonderingwall.com，国内直连）
     const ENDPOINT = "https://decap.wonderingwall.com/api/contact";
 
@@ -93,9 +95,9 @@
       const msg = form.querySelector("#message");
 
       let ok = true, errs = [];
-      if (!name.value.trim()) { ok = false; errs.push("请填写您的称呼"); }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { ok = false; errs.push("请填写有效的邮箱地址"); }
-      if (!msg.value.trim()) { ok = false; errs.push("请填写留言内容"); }
+      if (!name.value.trim()) { ok = false; errs.push(T("contact.status_required_name", "请填写您的称呼")); }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { ok = false; errs.push(T("contact.status_invalid_email", "请填写有效的邮箱地址")); }
+      if (!msg.value.trim()) { ok = false; errs.push(T("contact.status_required_msg", "请填写留言内容")); }
       if (!ok) {
         status.className = "form-status err";
         status.textContent = errs[0];
@@ -104,7 +106,7 @@
 
       submitBtn.disabled = true;
       status.className = "form-status";
-      status.textContent = "正在提交…";
+      status.textContent = T("contact.status_sending", "正在提交…");
 
       try {
         const res = await fetch(ENDPOINT, {
@@ -121,7 +123,7 @@
         const data = await res.json().catch(() => ({}));
         if (res.ok && data.ok) {
           status.className = "form-status ok";
-          status.textContent = "提交成功！我们的团队会在 1 个工作日内与您联系。";
+          status.textContent = T("contact.status_ok", "提交成功！我们的团队会在 1 个工作日内与您联系。");
           form.reset();
         } else {
           throw new Error(data.error || "send failed");
@@ -129,7 +131,7 @@
       } catch (err) {
         console.error("[contact] submit failed:", err);
         status.className = "form-status err";
-        status.textContent = "提交失败，请稍后重试，或直接发邮件至 contact@wonderingwall.com。";
+        status.textContent = T("contact.status_fail", "提交失败，请稍后重试，或直接发邮件至 contact@wonderingwall.com。");
       } finally {
         submitBtn.disabled = false;
       }

@@ -159,6 +159,17 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .nav__links a.active::after { transform: scaleX(1); }
 .nav__cta { margin-left: 8px; }
 
+/* Language switcher */
+.nav__lang { display: inline-flex; align-items: center; gap: 2px; margin-left: 10px; padding: 3px;
+  border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.06); }
+.nav.scrolled .nav__lang { border-color: var(--slate-200); background: var(--bg-soft); }
+.nav__lang button { border: none; background: transparent; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,.7); padding: 5px 10px; border-radius: 999px; transition: .2s var(--ease); }
+.nav.scrolled .nav__lang button { color: var(--slate-600); }
+.nav__lang button:hover { color: #fff; }
+.nav.scrolled .nav__lang button:hover { color: var(--accent); }
+.nav__lang button.active { background: var(--accent-grad); color: #fff; box-shadow: 0 6px 16px -8px rgba(47,107,255,.7); }
+
 .nav__toggle { display: none; width: 44px; height: 44px; border: none; background: transparent;
   cursor: pointer; position: relative; }
 .nav__toggle span { position: absolute; left: 11px; right: 11px; height: 2px; background: #fff; border-radius: 2px; transition: .3s var(--ease); }

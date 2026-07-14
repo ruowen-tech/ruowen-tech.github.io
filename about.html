@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>关于我们 — 上海若紊科技有限公司</title>
+  <title data-i18n="meta.about">关于我们 — 上海若紊科技有限公司</title>
   <meta name="description" content="上海若紊科技以自研芯片级感知与场景化算法，专注智能生活周边设备的研发，致力于让科技自然融入日常。" />
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
   <link rel="stylesheet" href="assets/css/style.css" />
@@ -20,13 +20,14 @@
         <span class="brand__name">若紊科技<small>RUOWEN TECH</small></span>
       </a>
       <nav class="nav__links">
-        <a href="index.html">首页</a>
-        <a href="about.html">关于我们</a>
-        <a href="products.html">产品服务</a>
-        <a href="news.html">新闻动态</a>
-        <a href="recruit.html">加入我们</a>
-                <a href="contact.html">联系我们</a>
-        <span class="nav__cta"><a class="btn btn--primary btn--sm" href="contact.html">合作咨询</a></span>
+        <a href="index.html" data-i18n="nav.home">首页</a>
+        <a href="about.html" data-i18n="nav.about">关于我们</a>
+        <a href="products.html" data-i18n="nav.products">产品服务</a>
+        <a href="news.html" data-i18n="nav.news">新闻动态</a>
+        <a href="recruit.html" data-i18n="nav.recruit">加入我们</a>
+        <a href="contact.html" data-i18n="nav.contact">联系我们</a>
+        <span class="nav__cta"><a class="btn btn--primary btn--sm" href="contact.html" data-i18n="nav.cta">合作咨询</a></span>
+        <span class="nav__lang" id="langSwitch"></span>
       </nav>
       <button class="nav__toggle" aria-label="菜单"><span></span><span></span><span></span></button>
     </div>
@@ -35,9 +36,9 @@
   <!-- ===== Page hero ===== -->
   <section class="page-hero">
     <div class="container">
-      <span class="eyebrow reveal">关于我们</span>
-      <h1 class="reveal d1">把复杂的科技，<br>做成随手可用的日常</h1>
-      <p class="reveal d2">上海若紊科技有限公司成立于智能硬件快速普及的时代。我们相信，真正好的智能不该被感知——它只是让生活顺手了一点，再顺手一点。</p>
+      <span class="eyebrow reveal" data-i18n="about.hero_eyebrow">关于我们</span>
+      <h1 class="reveal d1" data-i18n-html="about.hero_h1">把复杂的科技，<br>做成随手可用的日常</h1>
+      <p class="reveal d2" data-i18n="about.hero_lead">上海若紊科技有限公司成立于智能硬件快速普及的时代。我们相信，真正好的智能不该被感知——它只是让生活顺手了一点，再顺手一点。</p>
     </div>
   </section>
 
@@ -45,25 +46,25 @@
   <section class="section">
     <div class="container">
       <div class="section-head reveal">
-        <span class="eyebrow">我们是谁</span>
-        <h2 class="section-title">一支痴迷于"感知"与"连接"的团队</h2>
-        <p class="section-lead">从一枚低功耗传感模组，到一套调度全屋设备的智能平台，若紊以全链路自研能力，为智能生活周边设备提供从概念到量产的一体化支撑。</p>
+        <span class="eyebrow" data-i18n="about.who_eyebrow">我们是谁</span>
+        <h2 class="section-title" data-i18n="about.who_title">一支痴迷于"感知"与"连接"的团队</h2>
+        <p class="section-lead" data-i18n="about.who_lead">从一枚低功耗传感模组，到一套调度全屋设备的智能平台，若紊以全链路自研能力，为智能生活周边设备提供从概念到量产的一体化支撑。</p>
       </div>
       <div class="mission-grid" style="margin-top:48px">
         <div class="mission reveal d1">
-          <span class="k">Mission</span>
-          <h3>使命</h3>
-          <p>以自研智能硬件，降低科技使用的门槛，让每个家庭都能轻松享受更舒适、更安心的日常。</p>
+          <span class="k" data-i18n="about.mission1_k">Mission</span>
+          <h3 data-i18n="about.mission1_t">使命</h3>
+          <p data-i18n="about.mission1_d">以自研智能硬件，降低科技使用的门槛，让每个家庭都能轻松享受更舒适、更安心的日常。</p>
         </div>
         <div class="mission reveal d2">
-          <span class="k">Vision</span>
-          <h3>愿景</h3>
-          <p>成为智能生活周边设备领域最值得信赖的研发伙伴，让"若紊"成为品质与温度的代名词。</p>
+          <span class="k" data-i18n="about.mission2_k">Vision</span>
+          <h3 data-i18n="about.mission2_t">愿景</h3>
+          <p data-i18n="about.mission2_d">成为智能生活周边设备领域最值得信赖的研发伙伴，让"若紊"成为品质与温度的代名词。</p>
         </div>
         <div class="mission reveal d3">
-          <span class="k">Approach</span>
-          <h3>方法</h3>
-          <p>用户中心设计 + 芯片级自研 + 场景化算法，用系统化方法把复杂收敛成简单。</p>
+          <span class="k" data-i18n="about.mission3_k">Approach</span>
+          <h3 data-i18n="about.mission3_t">方法</h3>
+          <p data-i18n="about.mission3_d">用户中心设计 + 芯片级自研 + 场景化算法，用系统化方法把复杂收敛成简单。</p>
         </div>
       </div>
     </div>
@@ -73,34 +74,34 @@
   <section class="section section--soft">
     <div class="container">
       <div class="section-head reveal">
-        <span class="eyebrow">发展历程</span>
-        <h2 class="section-title">每一步，都更接近理想的生活</h2>
+        <span class="eyebrow" data-i18n="about.timeline_eyebrow">发展历程</span>
+        <h2 class="section-title" data-i18n="about.timeline_title">每一步，都更接近理想的生活</h2>
       </div>
       <div class="timeline reveal" style="margin-top:40px;max-width:760px">
         <div class="tl-item">
           <div class="tl-year">2018</div>
-          <h4>若紊科技成立</h4>
-          <p>核心团队集结于上海，确立以智能生活周边设备为主攻方向的研发路线。</p>
+          <h4 data-i18n="about.tl1_t">若紊科技成立</h4>
+          <p data-i18n="about.tl1_d">核心团队集结于上海，确立以智能生活周边设备为主攻方向的研发路线。</p>
         </div>
         <div class="tl-item">
           <div class="tl-year">2020</div>
-          <h4>首款自研传感模组量产</h4>
-          <p>低功耗环境传感模组实现规模化量产，奠定全链路自研能力的基础。</p>
+          <h4 data-i18n="about.tl2_t">首款自研传感模组量产</h4>
+          <p data-i18n="about.tl2_d">低功耗环境传感模组实现规模化量产，奠定全链路自研能力的基础。</p>
         </div>
         <div class="tl-item">
           <div class="tl-year">2022</div>
-          <h4>Ruowen Hub 智能中枢发布</h4>
-          <p>推出本地优先的智能家居中枢，实现跨品类设备的稳定协同与隐私保护。</p>
+          <h4 data-i18n="about.tl3_t">Ruowen Hub 智能中枢发布</h4>
+          <p data-i18n="about.tl3_d">推出本地优先的智能家居中枢，实现跨品类设备的稳定协同与隐私保护。</p>
         </div>
         <div class="tl-item">
           <div class="tl-year">2024</div>
-          <h4>智能穿戴产品线落地</h4>
-          <p>Ruowen Ring 智能指环上市，将健康感知延伸至身体，构建"家与人"的完整体验。</p>
+          <h4 data-i18n="about.tl4_t">智能穿戴产品线落地</h4>
+          <p data-i18n="about.tl4_d">Ruowen Ring 智能指环上市，将健康感知延伸至身体，构建"家与人"的完整体验。</p>
         </div>
         <div class="tl-item">
           <div class="tl-year">2026</div>
-          <h4>开放平台与生态合作</h4>
-          <p>面向行业伙伴开放设备接入与数据能力，迈向平台化与生态化新阶段。</p>
+          <h4 data-i18n="about.tl5_t">开放平台与生态合作</h4>
+          <p data-i18n="about.tl5_d">面向行业伙伴开放设备接入与数据能力，迈向平台化与生态化新阶段。</p>
         </div>
       </div>
     </div>
@@ -110,29 +111,29 @@
   <section class="section">
     <div class="container">
       <div class="section-head center reveal">
-        <span class="eyebrow">价值观</span>
-        <h2 class="section-title">我们坚持的事</h2>
+        <span class="eyebrow" data-i18n="about.values_eyebrow">价值观</span>
+        <h2 class="section-title" data-i18n="about.values_title">我们坚持的事</h2>
       </div>
       <div class="value-grid" style="margin-top:48px">
         <div class="value reveal d1">
           <span class="v-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4Z"/></svg></span>
-          <h4>用户为先</h4>
-          <p>从真实生活场景出发，而非技术炫技。</p>
+          <h4 data-i18n="about.val1_t">用户为先</h4>
+          <p data-i18n="about.val1_d">从真实生活场景出发，而非技术炫技。</p>
         </div>
         <div class="value reveal d2">
           <span class="v-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3" stroke-linecap="round"/><circle cx="12" cy="12" r="3"/></svg></span>
-          <h4>技术扎实</h4>
-          <p>核心能力自研，把命运握在自己手中。</p>
+          <h4 data-i18n="about.val2_t">技术扎实</h4>
+          <p data-i18n="about.val2_d">核心能力自研，把命运握在自己手中。</p>
         </div>
         <div class="value reveal d3">
           <span class="v-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z"/></svg></span>
-          <h4>长期主义</h4>
-          <p>陪伴产品全生命周期，持续迭代。</p>
+          <h4 data-i18n="about.val3_t">长期主义</h4>
+          <p data-i18n="about.val3_d">陪伴产品全生命周期，持续迭代。</p>
         </div>
         <div class="value reveal d4">
           <span class="v-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="11" r="2.4"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M14.5 20c.3-2 1.8-3.4 3.5-3.4 1.7 0 3 1.4 3 3.4" stroke-linecap="round"/></svg></span>
-          <h4>开放协作</h4>
-          <p>与伙伴共建生态，把蛋糕做大。</p>
+          <h4 data-i18n="about.val4_t">开放协作</h4>
+          <p data-i18n="about.val4_d">与伙伴共建生态，把蛋糕做大。</p>
         </div>
       </div>
     </div>
@@ -142,10 +143,10 @@
   <section class="section section--mist">
     <div class="container">
       <div class="statband reveal">
-        <div class="item"><div class="n"><span data-count="120">0</span></div><div class="t">专利与软著</div></div>
-        <div class="item"><div class="n"><span data-count="80">0</span><span class="u">+</span></div><div class="t">研发工程师</div></div>
-        <div class="item"><div class="n"><span data-count="3">0</span></div><div class="t">核心产品线</div></div>
-        <div class="item"><div class="n"><span data-count="8">0</span><span class="u">年</span></div><div class="t">行业深耕</div></div>
+        <div class="item"><div class="n"><span data-count="120">0</span></div><div class="t" data-i18n="about.stat_t1">专利与软著</div></div>
+        <div class="item"><div class="n"><span data-count="80">0</span><span class="u" data-i18n="u.item">+</span></div><div class="t" data-i18n="about.stat_t2">研发工程师</div></div>
+        <div class="item"><div class="n"><span data-count="3">0</span></div><div class="t" data-i18n="about.stat_t3">核心产品线</div></div>
+        <div class="item"><div class="n"><span data-count="8">0</span><span class="u" data-i18n="u.year">年</span></div><div class="t" data-i18n="about.stat_t4">行业深耕</div></div>
       </div>
     </div>
   </section>
@@ -154,12 +155,12 @@
   <section class="section">
     <div class="container">
       <div class="cta reveal">
-        <h2>想更了解若紊？</h2>
-        <p>我们乐于分享研发理念与产品细节，也欢迎志同道合的伙伴来聊聊。</p>
+        <h2 data-i18n="about.cta_title">想更了解若紊？</h2>
+        <p data-i18n="about.cta_p">我们乐于分享研发理念与产品细节，也欢迎志同道合的伙伴来聊聊。</p>
         <div class="hero__actions">
-          <a class="btn btn--light" href="contact.html">联系我们
+          <a class="btn btn--light" href="contact.html" data-i18n="common.contact">联系我们
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-          <a class="btn btn--ghost" style="color:#fff;border-color:rgba(255,255,255,.35)" href="products.html">查看产品</a>
+          <a class="btn btn--ghost" style="color:#fff;border-color:rgba(255,255,255,.35)" href="products.html" data-i18n="common.products">查看产品</a>
         </div>
       </div>
     </div>
@@ -174,33 +175,33 @@
             <span class="brand__mark"><svg viewBox="0 0 64 64" fill="none"><path d="M20 44V20h11a9 9 0 0 1 0 18H20" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="44" cy="44" r="5" fill="#fff"/></svg></span>
             <span class="brand__name">若紊科技<small>RUOWEN TECH</small></span>
           </a>
-          <p class="footer__about">上海若紊科技有限公司 · 专注于智能生活周边设备的研发与创新，让科技自然融入日常。</p>
+          <p class="footer__about" data-i18n="footer.about">上海若紊科技有限公司 · 专注于智能生活周边设备的研发与创新，让科技自然融入日常。</p>
         </div>
         <div class="footer__col">
-          <h5>导航</h5>
-          <a href="index.html">首页</a>
-          <a href="about.html">关于我们</a>
-          <a href="products.html">产品服务</a>
-          <a href="news.html">新闻动态</a>
-          <a href="recruit.html">加入我们</a>
-                    <a href="contact.html">联系我们</a>
+          <h5 data-i18n="footer.nav_title">导航</h5>
+          <a href="index.html" data-i18n="nav.home">首页</a>
+          <a href="about.html" data-i18n="nav.about">关于我们</a>
+          <a href="products.html" data-i18n="nav.products">产品服务</a>
+          <a href="news.html" data-i18n="nav.news">新闻动态</a>
+          <a href="recruit.html" data-i18n="nav.recruit">加入我们</a>
+          <a href="contact.html" data-i18n="nav.contact">联系我们</a>
         </div>
         <div class="footer__col">
-          <h5>产品</h5>
-          <a href="products.html">智能家居中枢</a>
-          <a href="products.html">智能穿戴</a>
-          <a href="products.html">环境传感器</a>
-          <a href="offical-website/software-list.html">软件下载</a>
+          <h5 data-i18n="footer.products_title">产品</h5>
+          <a href="products.html" data-i18n="footer.product1">智能家居中枢</a>
+          <a href="products.html" data-i18n="footer.product2">智能穿戴</a>
+          <a href="products.html" data-i18n="footer.product3">环境传感器</a>
+          <a href="offical-website/software-list.html" data-i18n="footer.software">软件下载</a>
         </div>
         <div class="footer__col">
-          <h5>联系</h5>
-          <a href="contact.html">合作咨询</a>
+          <h5 data-i18n="footer.contact_title">联系</h5>
+          <a href="contact.html" data-i18n="footer.consult">合作咨询</a>
           <a href="mailto:contact@wonderingwall.com">contact@wonderingwall.com</a>
-          <a href="contact.html">上海市 · 浦东新区</a>
+          <a href="contact.html" data-i18n="footer.address">上海市 · 浦东新区</a>
         </div>
       </div>
       <div class="footer__bottom">
-        <div>© <span data-year>2026</span> 上海若紊科技有限公司 保留所有权利</div>
+        <div>© <span data-year>2026</span> <span data-i18n="footer.rights">上海若紊科技有限公司 保留所有权利</span></div>
         <div class="footer__social">
           <a href="contact.html" aria-label="微信"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="10" r="6"/><circle cx="16" cy="14" r="5"/></svg></a>
           <a href="contact.html" aria-label="邮箱"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -210,6 +211,7 @@
     </div>
   </footer>
 
+  <script src="assets/js/i18n.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>
