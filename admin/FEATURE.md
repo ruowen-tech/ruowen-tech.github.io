@@ -108,3 +108,30 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 - **收信方案**：Cloudflare **Email Routing**（DNS 已迁 Cloudflare），将 `contact@wonderingwall.com` 转发至运营者个人收件箱。免费、国内可达、无需额外邮件服务商。
 - **改动范围**：`index / about / products / news / contact` 共 5 个页面、9 处邮箱链接与 meta 描述，已全部替换并校验无残留（提交 `e38ce4d`）。
 - **完成确认**：需向 `contact@wonderingwall.com` 发一封测试信，确认能进个人收件箱（检查 Cloudflare Email Routing 地址状态为 Active、目标邮箱已完成验证、MX/TXT 记录未被旧阿里云记录覆盖）。
+
+## 8. 联系表单真实发信（EmailJS）✅ 已实现，待填密钥
+
+### 背景（一个被发现的 bug）
+
+`contact.html` 的「提交咨询」表单（`#contactForm`）原本是**纯前端假表单**：`assets/js/main.js` 只做字段校验后直接把提示框写成"提交成功"并 `form.reset()`，**全程没有任何发信动作**。访客填写的姓名/电话/邮箱/需求在浏览器里被清空丢弃，运营者**收不到任何网页提交的咨询**——且这跟 Cloudflare Email Routing 无关（路由只对直接发到该邮箱的邮件生效，表单没用它）。
+
+### 修复方案：EmailJS（纯前端，零成本）
+
+- `contact.html` 引入 EmailJS SDK（`@emailjs/browser@4`，jsDelivr CDN，位于 `main.js` 之前）。
+- `main.js` 表单处理改为：`emailjs.send(serviceId, templateId, {name, phone, email, topic, message, reply_to}, {publicKey})`。
+  - 成功 → 显示"提交成功！我们的团队会在 1 个工作日内与您联系。"并清空表单。
+  - 失败 → 显示"提交失败…或直接发邮件至 contact@wonderingwall.com"。
+  - 未填密钥时 → 显示"表单发信服务尚未配置，请直接发邮件至 contact@wonderingwall.com"（避免访客误以为发送成功）。
+- 发信目标：`contact@wonderingwall.com`（经 Cloudflare Email Routing 转运营者个人邮箱）。`reply_to` 设为访客邮箱，便于直接回复。
+
+### 运营者需要做的（一次性，控制台操作）
+
+1. 注册 [EmailJS](https://www.emailjs.com/) 免费账号（200 封/月）。
+2. **Email Services** 添加一个服务（如 Gmail / Outlook，或用 EmailJS 默认 Host），记下 `Service ID`。
+3. **Email Templates** 新建模板，收件人填 `contact@wonderingwall.com`，正文可用变量：`{{name}}`、`{{phone}}`、`{{email}}`、`{{topic}}`、`{{message}}`，记下 `Template ID`。
+4. **Account → General → API Keys** 复制 `Public Key`。
+5. 把这三个值填入 `assets/js/main.js` 顶部的 `EMAILJS = { publicKey, serviceId, templateId }`（替换 `YOUR_*` 占位符）。
+6. 提交推送后，在 `https://www.wonderingwall.com/contact.html` 实测：填表提交应显示"提交成功"，运营者个人邮箱收到咨询邮件。
+
+- 提交记录：`e4074a4`（contact.html + main.js）。
+- ⚠️ 密钥是公开前端可用的 Public Key，仅限发信、不可读邮件；若需更高安全，可改用 Cloudflare Worker 中转（见第 3 节代理思路）。
