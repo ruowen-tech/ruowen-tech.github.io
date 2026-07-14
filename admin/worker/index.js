@@ -8,11 +8,25 @@
 //   3. GitHub 回调 <base_url>/callback?code=...&state=...
 //   4. 本 Worker 用 code 换取 access_token，再以 postMessage 把 token 回传给后台弹窗
 //
-// 部署需要两个 Secret（不要写进代码）：
+// 部署需要以下 Secret（不要写进代码）：
 //   GITHUB_CLIENT_ID     - GitHub OAuth App 的 Client ID
 //   GITHUB_CLIENT_SECRET - GitHub OAuth App 的 Client Secret
+//   RESEND_API_KEY       - Resend API Key（联系表单发信用，免费档 3000/月）
 // 见 wrangler.toml 与 ../DEPLOY.md 步骤。
+//
+// 路由总览：
+//   /                → 302 跳 GitHub 授权页（Decap 登录入口）
+//   /auth            → 同上
+//   /callback        → GitHub OAuth 回调，换 token 并回传后台
+//   /api/contact     → 联系表单发信（POST JSON，经 Resend 发到 contact@wonderingwall.com）
+//   /healthz         → 健康检查
 // =========================================================
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
 
 export default {
   async fetch(request, env) {
@@ -98,6 +112,78 @@ export default {
           "Set-Cookie": "gh_oauth_state=; HttpOnly; Secure; Path=/; Max-Age=0",
         },
       });
+    }
+
+    // ---- 路由 3：联系表单发信（Resend，免费档 3000/月，Key 存 Secret）----
+    if (path === "/api/contact") {
+      const cors = {
+        "Access-Control-Allow-Origin": "https://www.wonderingwall.com",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Max-Age": "86400",
+      };
+      // 浏览器跨域预检
+      if (request.method === "OPTIONS") {
+        return new Response(null, { status: 204, headers: cors });
+      }
+      if (request.method !== "POST") {
+        return new Response("Method not allowed", { status: 405, headers: cors });
+      }
+      let payload;
+      try {
+        payload = await request.json();
+      } catch {
+        return new Response(JSON.stringify({ ok: false, error: "Invalid JSON" }),
+          { status: 400, headers: { ...cors, "content-type": "application/json" } });
+      }
+      const name = String(payload.name || "").trim();
+      const email = String(payload.email || "").trim();
+      const phone = String(payload.phone || "").trim();
+      const topic = String(payload.topic || "").trim();
+      const message = String(payload.message || "").trim();
+      if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !message) {
+        return new Response(JSON.stringify({ ok: false, error: "Missing required fields" }),
+          { status: 400, headers: { ...cors, "content-type": "application/json" } });
+      }
+
+      const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.6">
+  <h2 style="margin:0 0 12px">新的合作咨询</h2>
+  <p><strong>称呼：</strong>${escapeHtml(name)}</p>
+  <p><strong>邮箱：</strong>${escapeHtml(email)}</p>
+  <p><strong>电话：</strong>${escapeHtml(phone || "（未填）")}</p>
+  <p><strong>咨询类型：</strong>${escapeHtml(topic || "（未填）")}</p>
+  <p><strong>需求描述：</strong></p>
+  <blockquote style="border-left:3px solid #4f7cff;margin:0;padding:8px 12px;background:#f5f7ff">${escapeHtml(message)}</blockquote>
+</div>`;
+
+      try {
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "若紊科技 <contact@wonderingwall.com>",
+            to: ["contact@wonderingwall.com"],
+            reply_to: email,
+            subject: `合作咨询 - ${name}`,
+            html,
+          }),
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          console.error("[contact] Resend failed:", res.status, errText);
+          return new Response(JSON.stringify({ ok: false, error: "Send failed" }),
+            { status: 502, headers: { ...cors, "content-type": "application/json" } });
+        }
+        return new Response(JSON.stringify({ ok: true }),
+          { status: 200, headers: { ...cors, "content-type": "application/json" } });
+      } catch (e) {
+        console.error("[contact] Resend exception:", e);
+        return new Response(JSON.stringify({ ok: false, error: "Server error" }),
+          { status: 502, headers: { ...cors, "content-type": "application/json" } });
+      }
     }
 
     // ---- 健康检查（移动到了 /healthz，避免与登录入口冲突）----

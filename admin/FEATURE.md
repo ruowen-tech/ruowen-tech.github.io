@@ -109,29 +109,43 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 - **改动范围**：`index / about / products / news / contact` 共 5 个页面、9 处邮箱链接与 meta 描述，已全部替换并校验无残留（提交 `e38ce4d`）。
 - **完成确认**：需向 `contact@wonderingwall.com` 发一封测试信，确认能进个人收件箱（检查 Cloudflare Email Routing 地址状态为 Active、目标邮箱已完成验证、MX/TXT 记录未被旧阿里云记录覆盖）。
 
-## 8. 联系表单真实发信（EmailJS）✅ 已实现，待填密钥
+## 8. 联系表单真实发信（Cloudflare Worker + Resend）✅ 已实现，待填密钥
 
 ### 背景（一个被发现的 bug）
 
 `contact.html` 的「提交咨询」表单（`#contactForm`）原本是**纯前端假表单**：`assets/js/main.js` 只做字段校验后直接把提示框写成"提交成功"并 `form.reset()`，**全程没有任何发信动作**。访客填写的姓名/电话/邮箱/需求在浏览器里被清空丢弃，运营者**收不到任何网页提交的咨询**——且这跟 Cloudflare Email Routing 无关（路由只对直接发到该邮箱的邮件生效，表单没用它）。
 
-### 修复方案：EmailJS（纯前端，零成本）
+> 方案演进：先试 **EmailJS**（纯前端 SaaS），但免费额度有限（200/月）、部分能力转付费、且 Public Key 暴露在浏览器；用户要求"纯免费 + 代码自控"，遂改用 **Cloudflare Worker + Resend**——发信逻辑 100% 写在自己的 Worker 里，Resend 仅作免费 SMTP 中继，API Key 存为 Worker Secret 不进浏览器。
 
-- `contact.html` 引入 EmailJS SDK（`@emailjs/browser@4`，jsDelivr CDN，位于 `main.js` 之前）。
-- `main.js` 表单处理改为：`emailjs.send(serviceId, templateId, {name, phone, email, topic, message, reply_to}, {publicKey})`。
-  - 成功 → 显示"提交成功！我们的团队会在 1 个工作日内与您联系。"并清空表单。
-  - 失败 → 显示"提交失败…或直接发邮件至 contact@wonderingwall.com"。
-  - 未填密钥时 → 显示"表单发信服务尚未配置，请直接发邮件至 contact@wonderingwall.com"（避免访客误以为发送成功）。
-- 发信目标：`contact@wonderingwall.com`（经 Cloudflare Email Routing 转运营者个人邮箱）。`reply_to` 设为访客邮箱，便于直接回复。
+### 架构
+
+```
+访客填表 → contact.html(JS) → POST JSON → decap.wonderingwall.com/api/contact (我们的 Worker)
+                                                  │ 携 RESEND_API_KEY(Secret)
+                                                  ▼
+                                            Resend API (免费档 3000/月)
+                                                  ▼
+                                       contact@wonderingwall.com（→ 个人邮箱）
+```
+
+### 实现
+
+- `main.js` 表单处理改为 `fetch('https://decap.wonderingwall.com/api/contact', {method:'POST', JSON})`；成功显示"提交成功…"，失败显示"提交失败…或直接发邮件至 contact@wonderingwall.com"。
+- `admin/worker/index.js` 新增路由 `/api/contact`：
+  - 处理 CORS（仅允许 `https://www.wonderingwall.com`，含 OPTIONS 预检）。
+  - 校验 name/email/message，用 `escapeHtml` 转义后拼 HTML 邮件体。
+  - 调 `https://api.resend.com/emails`，`from: 若紊科技 <contact@wonderingwall.com>`，`to: contact@wonderingwall.com`，`reply_to: 访客邮箱`，`subject: 合作咨询 - {name}`。
+  - 返回 `{ok:true}` 或 `{ok:false, error}`，供前端判断。
+- 已移除 `contact.html` 的 EmailJS SDK 引用（不再依赖第三方前端库）。
 
 ### 运营者需要做的（一次性，控制台操作）
 
-1. 注册 [EmailJS](https://www.emailjs.com/) 免费账号（200 封/月）。
-2. **Email Services** 添加一个服务（如 Gmail / Outlook，或用 EmailJS 默认 Host），记下 `Service ID`。
-3. **Email Templates** 新建模板，收件人填 `contact@wonderingwall.com`，正文可用变量：`{{name}}`、`{{phone}}`、`{{email}}`、`{{topic}}`、`{{message}}`，记下 `Template ID`。
-4. **Account → General → API Keys** 复制 `Public Key`。
-5. 把这三个值填入 `assets/js/main.js` 顶部的 `EMAILJS = { publicKey, serviceId, templateId }`（替换 `YOUR_*` 占位符）。
-6. 提交推送后，在 `https://www.wonderingwall.com/contact.html` 实测：填表提交应显示"提交成功"，运营者个人邮箱收到咨询邮件。
+1. 注册 [Resend](https://resend.com/) 免费账号（**3000 封/月、100 封/天、无需信用卡**）。
+2. **Domains → Add Domain → `wonderingwall.com`**，按提示在 **Cloudflare DNS** 添加 Resend 给的 SPF / DKIM / DMARC 记录（TXT），等待状态变 Verified。
+3. **API Keys → Create Key**，复制 `re_...` 密钥。
+4. 在本地 `admin/worker` 目录执行：`npx wrangler secret put RESEND_API_KEY`，粘贴上面的密钥。
+5. 重新部署 Worker：`npx wrangler deploy`（确保 `RESEND_API_KEY` 生效；`GITHUB_CLIENT_ID/SECRET` 不受影响）。
+6. 提交推送前端改动，浏览器打开 `https://www.wonderingwall.com/contact.html` 实测：填表提交应显示"提交成功"，个人邮箱收到咨询邮件。
 
-- 提交记录：`e4074a4`（contact.html + main.js）。
-- ⚠️ 密钥是公开前端可用的 Public Key，仅限发信、不可读邮件；若需更高安全，可改用 Cloudflare Worker 中转（见第 3 节代理思路）。
+- 前端提交记录：`e4074a4` → 改 Resend：`（本提交）`（contact.html 去 EmailJS、main.js 改 POST、worker 加 /api/contact）。
+- ✅ 免费、代码自控、Secret 不暴露浏览器；发件域为自有域名 `wonderingwall.com`（Resend 要求验证域名，已含在第 2 步）。

@@ -76,21 +76,13 @@
   /* ---- Footer year ---- */
   document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 
-  /* ---- Contact form (delivered via EmailJS) ---- */
+  /* ---- Contact form (delivered via Cloudflare Worker + Resend) ---- */
   const form = document.getElementById("contactForm");
   if (form) {
-    // ⚠️ 在 EmailJS 后台创建 Service / Template 后，把下面的三项替换为真实值：
-    //   publicKey  → EmailJS 控制台 Account → General → API Keys → Public Key
-    //   serviceId  → EmailJS 控制台 Email Services → 对应 Service 的 ID
-    //   templateId → EmailJS 控制台 Email Templates → 对应 Template 的 ID
-    const EMAILJS = {
-      publicKey: "YOUR_PUBLIC_KEY",
-      serviceId: "YOUR_SERVICE_ID",
-      templateId: "YOUR_TEMPLATE_ID",
-    };
-
     const status = document.getElementById("formStatus");
     const submitBtn = form.querySelector('button[type="submit"]');
+    // 后端发信地址：我们自己的 Cloudflare Worker（自定义域名 decap.wonderingwall.com，国内直连）
+    const ENDPOINT = "https://decap.wonderingwall.com/api/contact";
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -110,32 +102,32 @@
         return;
       }
 
-      // 未配置密钥时给出友好提示，避免访客误以为发送成功
-      if (!EMAILJS.publicKey || EMAILJS.publicKey.indexOf("YOUR_") === 0) {
-        status.className = "form-status err";
-        status.textContent = "表单发信服务尚未配置，请直接发邮件至 contact@wonderingwall.com。";
-        return;
-      }
-
       submitBtn.disabled = true;
       status.className = "form-status";
       status.textContent = "正在提交…";
 
       try {
-        await emailjs.send(EMAILJS.serviceId, EMAILJS.templateId, {
-          name: name.value.trim(),
-          phone: phone.value.trim() || "（未填）",
-          email: email.value.trim(),
-          topic: topic.options[topic.selectedIndex].text,
-          message: msg.value.trim(),
-          reply_to: email.value.trim(),
-        }, { publicKey: EMAILJS.publicKey });
-
-        status.className = "form-status ok";
-        status.textContent = "提交成功！我们的团队会在 1 个工作日内与您联系。";
-        form.reset();
+        const res = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.value.trim(),
+            phone: phone.value.trim(),
+            email: email.value.trim(),
+            topic: topic.options[topic.selectedIndex].text,
+            message: msg.value.trim(),
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) {
+          status.className = "form-status ok";
+          status.textContent = "提交成功！我们的团队会在 1 个工作日内与您联系。";
+          form.reset();
+        } else {
+          throw new Error(data.error || "send failed");
+        }
       } catch (err) {
-        console.error("[contact] EmailJS send failed:", err);
+        console.error("[contact] submit failed:", err);
         status.className = "form-status err";
         status.textContent = "提交失败，请稍后重试，或直接发邮件至 contact@wonderingwall.com。";
       } finally {

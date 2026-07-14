@@ -33,7 +33,8 @@ content/news.json  ←→  content/jobs.json
 | GitHub OAuth App | 经典 OAuth App（**不是** GitHub App） | 提供 Client ID / Client Secret 给 Worker |
 | `GITHUB_CLIENT_ID` | OAuth App 公开的 Client ID | 设为 Worker 的 Secret |
 | `GITHUB_CLIENT_SECRET` | OAuth App 的 Secret（敏感） | 设为 Worker 的 Secret（**不要写进代码**） |
-| Cloudflare 账号 | 托管 Worker（免费层） | 部署 OAuth 代理 |
+| `RESEND_API_KEY` | 联系表单发信用（Resend 免费档 3000/月） | 设为 Worker 的 Secret；见下文「联系表单发信」一节 |
+| Cloudflare 账号 | 托管 Worker（免费层） | 部署 OAuth 代理 + 联系表单发信 |
 | Worker 地址 | 生产用自定义域名 `https://decap.wonderingwall.com`（国内直连）；Cloudflare 部署时给的 `*.workers.dev` 仅用于验证，**国内常被墙，不能当生产地址** | 回填到 `config.yml` 的 `base_url` |
 
 ---
@@ -122,6 +123,24 @@ npx wrangler secret put GITHUB_CLIENT_SECRET
 > 错误示范：`wrangler secret put Ov23liW90aHanaMyMxPE` —— 这会把你的 Client ID 当成**密钥名**存进去，创建一个名为 `Ov23...` 的垃圾 secret，而真正的 `GITHUB_CLIENT_SECRET` 却没设。
 > 正确做法：key 固定写 `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`，**值只在 `Enter a secret value:` 提示后粘贴**。
 > 检查是否设对：`wrangler secret list` 应只看到两个名字 `GITHUB_CLIENT_ID` 和 `GITHUB_CLIENT_SECRET`（不会出现以 Client ID 命名的项）。若有垃圾项，用 `wrangler secret delete <垃圾名>` 删掉。
+
+### 3.3b 联系表单发信（Resend，免费档 3000/月）
+
+「提交咨询」表单由 `https://decap.wonderingwall.com/api/contact`（同一 Worker）经 Resend 发出，API Key 存为 Secret，不进前端。
+
+1. 注册 [Resend](https://resend.com/) 免费账号（3000 封/月、100 封/天、无需信用卡）。
+2. **Domains → Add Domain → `wonderingwall.com`**，按提示在 **Cloudflare DNS** 添加 Resend 给的 SPF / DKIM / DMARC（TXT）记录，等状态变 **Verified**。
+3. **API Keys → Create Key**，复制 `re_...`。
+4. 在本地 `admin/worker` 目录执行（值只在提示后粘贴）：
+   ```bash
+   npx wrangler secret put RESEND_API_KEY
+   ```
+5. 重新部署使 Secret 生效（OAuth 两个 secret 不受影响）：
+   ```bash
+   npx wrangler deploy
+   ```
+6. 前端 `contact.html` 提交表单 → 应显示"提交成功"，`contact@wonderingwall.com`（→ 个人邮箱）收到咨询邮件，`reply_to` 为访客邮箱。
+7. 排查：Worker 日志 `wrangler tail` 看 `[contact]` 前缀；Resend 后台看发送记录与退回原因。
 
 ### 3.4 部署
 
