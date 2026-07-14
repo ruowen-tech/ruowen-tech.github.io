@@ -8,7 +8,7 @@
 ## 0. 架构与凭据一览
 
 ```
-编辑者在浏览器打开 https://ruowen-tech.github.io/admin/
+编辑者在浏览器打开 https://www.wonderingwall.com/admin/
         │
         ▼  点击「登录」→ 弹窗打开 <Worker>/auth
 自建 Cloudflare Worker（OAuth 代理，免费层）
@@ -61,8 +61,8 @@ content/news.json  ←→  content/jobs.json
 | 字段 | 填什么 |
 |------|--------|
 | Application name | `若紊科技 Decap CMS`（随意） |
-| Homepage URL | `https://ruowen-tech.github.io` |
-| Authorization callback URL | 先填占位的 `https://ruowen-decap-proxy.workers.dev/callback`（部署 Worker 后拿到真实地址再回来改） |
+| Homepage URL | `https://www.wonderingwall.com` |
+| Authorization callback URL | `https://ruowen-decap-proxy.spt-genius.workers.dev/callback`（**必须带 `/callback` 完整路径**，否则登录报 `redirect_uri_mismatch`） |
 | Description | 可选，如 `Decap CMS 登录代理` |
 
 5. 点 **Register application**
@@ -118,6 +118,11 @@ npx wrangler secret put GITHUB_CLIENT_SECRET
 > ⚠️ 不要把值直接拼在命令行后面（`wrangler secret put XXX 值` 会报错，且会让密钥进终端记录）。命令里只写 key，值在提示符后输入。
 > 若担心已泄露，回 OAuth App 页 `Regenerate secret` 重新生成，再 put 一次即可。
 
+> 🛑 **常见人为失误（已踩过）**：`secret put` 的**第一个参数是 key 名**，不是值。
+> 错误示范：`wrangler secret put Ov23liW90aHanaMyMxPE` —— 这会把你的 Client ID 当成**密钥名**存进去，创建一个名为 `Ov23...` 的垃圾 secret，而真正的 `GITHUB_CLIENT_SECRET` 却没设。
+> 正确做法：key 固定写 `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`，**值只在 `Enter a secret value:` 提示后粘贴**。
+> 检查是否设对：`wrangler secret list` 应只看到两个名字 `GITHUB_CLIENT_ID` 和 `GITHUB_CLIENT_SECRET`（不会出现以 Client ID 命名的项）。若有垃圾项，用 `wrangler secret delete <垃圾名>` 删掉。
+
 ### 3.4 部署
 
 ```bash
@@ -136,20 +141,19 @@ https://ruowen-decap-proxy.<你的子域>.workers.dev
 
 ## 4. 第三步：回填 config.yml 的 base_url
 
-打开 `admin/config.yml`，把第 17 行的占位地址改成真实 Worker 地址：
+打开 `admin/config.yml`，把 `base_url` 改成真实 Worker 地址（`site_url` 用自定义域名）：
 
 ```yaml
 backend:
   name: github
   repo: ruowen-tech/ruowen-tech.github.io
-  branch: develop
-  base_url: https://ruowen-decap-proxy.<你的子域>.workers.dev   # ← 改成第 3.4 步拿到的地址
+  branch: master          # GitHub Pages 发布源是 master（<user>.github.io 仓库只从 master 发布）
+  base_url: https://ruowen-decap-proxy.spt-genius.workers.dev   # ← 已部署的真实 Worker 地址
   auth_endpoint: auth
-  site_url: https://ruowen-tech.github.io
+  site_url: https://www.wonderingwall.com
 ```
 
-> **分支注意**：当前工作分支是 `develop`，`config.yml` 已写 `branch: develop`。
-> 若你的 GitHub Pages 发布源是别的分支（如 `main` / `master`），要么把这里改成对应分支，要么去仓库 **Settings → Pages** 把发布源设为 `develop`。
+> **分支注意**：本项目是 `<user>.github.io` 仓库，GitHub Pages **只从 `master` 发布**。Decap 会往 `branch` 指定的分支提交，所以这里必须写 `master`，否则后台改完线上不变。若你的发布源是别的分支，要么改这里，要么去仓库 **Settings → Pages** 把发布源设为对应分支。
 
 ---
 
@@ -160,7 +164,7 @@ backend:
 ```bash
 git add admin/ content/ 
 git commit -m "feat: 接入 Decap CMS + Cloudflare Worker OAuth 代理"
-git push origin develop
+git push origin master
 ```
 
 推送后 GitHub Pages 会自动重新构建发布。
@@ -169,7 +173,7 @@ git push origin develop
 
 ## 6. 第五步：使用后台
 
-1. 打开 `https://ruowen-tech.github.io/admin/`
+1. 打开 `https://www.wonderingwall.com/admin/`
 2. 点击「登录」→ 弹窗跳转到 GitHub → 授权该 OAuth App
 3. 回到后台，左侧出现 **新闻动态 / 招聘职位** 两个集合
 4. 新增 / 编辑 / 删除条目，点「Publish」保存
@@ -183,11 +187,13 @@ git push origin develop
 | 现象 | 原因 / 处理 |
 |------|------------|
 | 后台打开但点登录无反应 / 报错 | `config.yml` 的 `base_url` 未改成真实 Worker 地址；或 Worker 未部署 |
-| 跳转 GitHub 后报 `redirect_uri_mismatch` | OAuth App 的回调地址 ≠ `<base_url>/callback`。去 OAuth App 设置里改一致 |
+| 跳转 GitHub 后报 `redirect_uri_mismatch` | OAuth App 的 **Authorization callback URL** 必须是 `<base_url>/callback` 完整路径（含 `/callback`）。裸域名会 mismatch。去 OAuth App 设置里改一致 |
 | 授权后回弹窗报 `State mismatch` | 浏览器拦截了 Cookie / 跨站限制。确认 Worker 与站点均走 https，且未开过度严格的隐私拦截 |
-| 登录成功但保存时报 404 / 无权限 | 登录的 GitHub 账号对该仓库无**写权限**；或 `branch` 写错（见第 4 步分支注意） |
+| 登录成功但保存时报 404 / 无权限 | 登录的 GitHub 账号对该仓库无**写权限**；或 `branch` 写错（见第 4 步分支注意，应为 `master`） |
 | Worker 部署报 `No account_id` | 未 `wrangler login` 或未关联 Cloudflare 账号 |
 | `wrangler secret put` 报 `Unknown arguments` | 把值拼到了命令行（`pub` 之类也属拼错，正确是 `put` 且值单独输入） |
+| `wrangler secret list` 出现以 Client ID 命名的 secret（如 `Ov23...`） | 误把密钥**值**当 key 执行了 `put`，真正的 `GITHUB_CLIENT_SECRET` 没设。删掉该垃圾项：`wrangler secret delete <垃圾名>`，再正确执行 `wrangler secret put GITHUB_CLIENT_SECRET` 并在提示后粘贴值 |
+| 登录卡在 GitHub 授权后无反应 | 检查两个 secret 是否都设齐（`GITHUB_CLIENT_ID` + `GITHUB_CLIENT_SECRET`）。缺 `GITHUB_CLIENT_SECRET` 时换 token 会静默失败 |
 
 ---
 
