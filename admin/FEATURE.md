@@ -93,8 +93,18 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 | 代理自定义域名 | `decap.wonderingwall.com` |
 | GitHub OAuth App | 「若紊科技 Decap CMS」 |
 | OAuth 回调地址 | `https://decap.wonderingwall.com/callback` |
+| 联系邮箱 | `contact@wonderingwall.com`（Cloudflare Email Routing 转发至运营者个人收件箱） |
+| 合作热线 | `+86 21 5000 0000`（已注释隐藏，待启用） |
 
 ## 6. 访问入口
 
 - **公开站点**：`https://www.wonderingwall.com/`
 - **内容后台**：`https://www.wonderingwall.com/admin/`（入口已隐藏，凭 URL 访问；登录走 `decap.wonderingwall.com` 代理，国内直连无需翻墙）
+
+## 7. 联系邮箱配置 ✅ 已完成
+
+- **联系邮箱**：统一为 `contact@wonderingwall.com`。
+  - 此前误用 `contact@ruowen-tech.com`，但该域名无 DNS / 收信能力，实际收不到信；已全面改回自有域名 `wonderingwall.com`。
+- **收信方案**：Cloudflare **Email Routing**（DNS 已迁 Cloudflare），将 `contact@wonderingwall.com` 转发至运营者个人收件箱。免费、国内可达、无需额外邮件服务商。
+- **改动范围**：`index / about / products / news / contact` 共 5 个页面、9 处邮箱链接与 meta 描述，已全部替换并校验无残留（提交 `e38ce4d`）。
+- **完成确认**：需向 `contact@wonderingwall.com` 发一封测试信，确认能进个人收件箱（检查 Cloudflare Email Routing 地址状态为 Active、目标邮箱已完成验证、MX/TXT 记录未被旧阿里云记录覆盖）。
