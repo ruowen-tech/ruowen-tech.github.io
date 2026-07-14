@@ -94,6 +94,7 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 | GitHub OAuth App | 「若紊科技 Decap CMS」 |
 | OAuth 回调地址 | `https://decap.wonderingwall.com/callback` |
 | 联系邮箱 | `contact@wonderingwall.com`（Cloudflare Email Routing 转发至运营者个人收件箱） |
+| HR 投递邮箱 | `hr@wonderingwall.com`（招聘页"投递简历/投递人才库"用，需 Cloudflare Email Routing 转发） |
 | 合作热线 | `+86 21 5000 0000`（已注释隐藏，待启用） |
 
 ## 6. 访问入口
@@ -108,6 +109,13 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 - **收信方案**：Cloudflare **Email Routing**（DNS 已迁 Cloudflare），将 `contact@wonderingwall.com` 转发至运营者个人收件箱。免费、国内可达、无需额外邮件服务商。
 - **改动范围**：`index / about / products / news / contact` 共 5 个页面、9 处邮箱链接与 meta 描述，已全部替换并校验无残留（提交 `e38ce4d`）。
 - **完成确认**：需向 `contact@wonderingwall.com` 发一封测试信，确认能进个人收件箱（检查 Cloudflare Email Routing 地址状态为 Active、目标邮箱已完成验证、MX/TXT 记录未被旧阿里云记录覆盖）。
+
+### HR 投递邮箱
+
+- **HR 邮箱**：统一为 `hr@wonderingwall.com`（招聘页"投递简历/投递人才库"按钮与页脚联系栏使用）。
+  - 此前误用 `hr@ruowen-tech.com`（无 DNS / 收信能力）。已全面替换为自有域名 `wonderingwall.com`（提交 `55577c0`）。
+  - 接收简历的 `mailto:` 链接位于 `recruit.html`（3 处）与 `assets/js/recruit.js`（1 处，岗位"投递简历"按钮自动带 `subject=应聘：岗位名`），已全部替换并校验无残留。
+- **收信前提**：需在 Cloudflare **Email Routing** 另加一条 `hr@wonderingwall.com` → 个人收件箱的转发规则（与 `contact@` 同源即可，目标邮箱已验证则即时生效）。仅配 `contact@` 时 `hr@` 仍收不到信。
 
 ## 8. 联系表单真实发信（Cloudflare Worker + Resend）✅ 已实现，待填密钥
 
