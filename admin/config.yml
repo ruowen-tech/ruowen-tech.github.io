@@ -1,0 +1,68 @@
+# =========================================================
+# 上海若紊科技 · Decap CMS 配置
+# 新闻 / 招聘内容以 JSON 文件形式存于仓库，提交即由 GitHub Pages 重新发布
+# =========================================================
+
+backend:
+  # 登录认证：自建 Cloudflare Worker OAuth 代理（免费、自托管、无第三方依赖）
+  # 流程：后台弹窗打开 <base_url>/auth → Worker 重定向 GitHub 授权页 →
+  #       GitHub 回调 <base_url>/callback → Worker 用 code 换 token 并经
+  #       postMessage 把 token 回传给后台弹窗。
+  # 注意：Netlify Identity / Git Gateway 已于 2025-02-28 废弃，不再使用。
+  # 部署步骤见 admin/worker/（须用自己的 GitHub / Cloudflare 账号完成）。
+  name: github
+  repo: ruowen-tech/ruowen-tech.github.io
+  branch: develop
+  # 部署 Worker 后，把下面 base_url 改成你的 Worker 地址（含 https）：
+  base_url: https://ruowen-decap-proxy.workers.dev
+  auth_endpoint: auth
+  # 仓库为公开仓库时用 public_repo 即可；若为私有仓库，把 Worker 的 scope 改为 repo
+  site_url: https://ruowen-tech.github.io
+
+media_folder: "content/uploads"
+public_folder: "/content/uploads"
+
+collections:
+  - name: "news"
+    label: "新闻动态"
+    files:
+      - name: "news-data"
+        label: "新闻列表"
+        file: "content/news.json"
+        fields:
+          - name: items
+            label: "新闻条目"
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { name: id, label: "ID", widget: string }
+              - { name: title, label: "标题", widget: string }
+              - { name: date, label: "日期", widget: date }
+              - { name: category, label: "分类", widget: select, options: ["公司动态", "产品发布", "技术分享", "合作生态", "行业动态"] }
+              - { name: emoji, label: "图标 Emoji", widget: string }
+              - { name: summary, label: "摘要", widget: text }
+              - { name: body, label: "正文", widget: markdown }
+
+  - name: "jobs"
+    label: "招聘职位"
+    files:
+      - name: "jobs-data"
+        label: "职位列表"
+        file: "content/jobs.json"
+        fields:
+          - name: items
+            label: "职位条目"
+            widget: list
+            summary: "{{fields.title}}"
+            fields:
+              - { name: id, label: "ID", widget: string }
+              - { name: title, label: "职位名称", widget: string }
+              - { name: dept, label: "部门", widget: string }
+              - { name: location, label: "工作地点", widget: string }
+              - { name: type, label: "用工类型", widget: select, options: ["全职", "兼职", "实习"] }
+              - { name: salary, label: "薪资", widget: string }
+              - { name: desc, label: "岗位职责", widget: text }
+              - name: requirements
+                label: "任职要求"
+                widget: list
+                field: { name: item, label: "要求", widget: string }

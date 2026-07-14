@@ -1,30 +1,237 @@
 <!DOCTYPE html>
-<!-- 首页 -->
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-    body{ text-align:center}
-    .div{ margin:0 auto;}
-    .link {
-        margin: 20px;
-        text-decoration: none;
-        color: #007bff; /* 链接颜色 */
-        font-size: 18px; /* 字体大小 */
-    }
-    .link:hover {
-        text-decoration: underline; /* 悬停时下划线 */
-    }
-    </style>
-    <title>Ruowen Tech</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>上海若紊科技有限公司 — 智能生活周边设备研发</title>
+  <meta name="description" content="上海若紊科技有限公司专注智能生活周边设备的研发与创新，提供智能家居中枢、可穿戴设备与环境传感矩阵等一体化解决方案。" />
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-<div class="div">
-    <p>生活中的点点滴滴，我们用系统化的方法帮你管理，用最有效的手段去让你变得更懒，让机器变得更聪明，从而为人们的生活提供更优质的服务。</p>
-    <p>生活中的科学有你有我！</p>
-    <a href="offical-website/software-list.html" class="link">找官网下载软件</a>
-</div>
 
+  <!-- ===== Nav ===== -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__mark">
+          <svg viewBox="0 0 64 64" fill="none">
+            <path d="M20 44V20h11a9 9 0 0 1 0 18H20" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="44" cy="44" r="5" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="brand__name">若紊科技<small>RUOWEN TECH</small></span>
+      </a>
+      <nav class="nav__links">
+        <a href="index.html">首页</a>
+        <a href="about.html">关于我们</a>
+        <a href="products.html">产品服务</a>
+        <a href="news.html">新闻动态</a>
+        <a href="recruit.html">加入我们</a>
+        <a href="admin/">后台管理</a>
+        <a href="contact.html">联系我们</a>
+        <span class="nav__cta"><a class="btn btn--primary btn--sm" href="contact.html">合作咨询</a></span>
+      </nav>
+      <button class="nav__toggle" aria-label="菜单"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__grid"></div>
+    <div class="hero__inner">
+      <div class="container">
+        <span class="hero__badge reveal"><span class="dot"></span> 智能生活 · 自研硬件 · 一体化方案</span>
+        <h1 class="reveal d1">让智能<br><span class="grad">自然融入</span>生活的每一刻</h1>
+        <p class="lead reveal d2">上海若紊科技专注于智能生活周边设备的研发，以芯片级感知、低功耗连接与场景化算法，把复杂的科技收敛成你随手可用的日常体验。</p>
+        <div class="hero__actions reveal d3">
+          <a class="btn btn--primary" href="products.html">查看产品方案
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn--light" href="about.html">了解我们</a>
+        </div>
+        <div class="hero__stats reveal d4">
+          <div class="stat"><div class="num"><span data-count="8">0</span><span class="u">年</span></div><div class="lbl">深耕智能硬件</div></div>
+          <div class="stat"><div class="num"><span data-count="120">0</span><span class="u">项</span></div><div class="lbl">自主知识产权</div></div>
+          <div class="stat"><div class="num"><span data-count="50">0</span><span class="u">万+</span></div><div class="lbl">设备稳定连接</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero__scroll"><div class="mouse"></div>SCROLL</div>
+  </section>
+
+  <!-- ===== Core advantages ===== -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">核心优势</span>
+        <h2 class="section-title">把复杂留给我们，把简单交给你</h2>
+        <p class="section-lead">从感知、连接到场景算法，自研全链路能力让我们能为每一种生活方式定制恰到好处的智能。</p>
+      </div>
+      <div class="grid grid--4" style="margin-top:48px">
+        <div class="card feature reveal d1">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3" stroke-linecap="round"/></svg></span>
+          <h3>芯片级感知</h3>
+          <p>自研低功耗传感与边缘计算模组，让设备更懂环境，也更省电。</p>
+        </div>
+        <div class="card feature reveal d2">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M7.8 7.4 10.4 16M16.2 7.4 13.6 16M8.4 6h7.2" stroke-linecap="round"/></svg></span>
+          <h3>无缝互联</h3>
+          <p>多协议兼容的互联框架，跨品牌、跨品类设备一键协同工作。</p>
+        </div>
+        <div class="card feature reveal d3">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z"/><path d="M9.5 11.5h1.5l1-2 1.2 3 1-1.5h1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h3>场景化算法</h3>
+          <p>基于真实生活节律的算法模型，主动预判需求，而非被动响应。</p>
+        </div>
+        <div class="card feature reveal d4">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h3>品质保障</h3>
+          <p>全流程品控与 99.9% 可用性平台，让每一次连接都可靠稳定。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Product preview ===== -->
+  <section class="section section--soft">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">产品概览</span>
+        <h2 class="section-title">围绕"家"与"人"的智能周边</h2>
+        <p class="section-lead">三类核心产品线，覆盖从空间到身体的智能感知，统一由若紊智能平台调度。</p>
+      </div>
+
+      <div class="prod-row reveal" style="margin-top:56px">
+        <div class="prod-media"><div class="glow"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4" stroke-linecap="round"/><circle cx="12" cy="10.5" r="3" stroke-linecap="round"/><path d="M10 8.5h.01M14 12.5h.01" stroke-linecap="round"/></svg>
+        </div>
+        <div class="prod-text">
+          <h3>Ruowen Hub 智能家居中枢</h3>
+          <p>本地优先的智能家居大脑，统一管理照明、温控、安防与影音，断网也能稳定运行，保护家庭隐私。</p>
+          <div class="taglist"><span class="tag">本地计算</span><span class="tag">多协议</span><span class="tag">隐私优先</span></div>
+          <a class="link-more" href="products.html">了解全部产品
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+
+      <div class="prod-row reverse reveal">
+        <div class="prod-media"><div class="glow"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 3.5h6M9 20.5h6M3.5 9v6M20.5 9v6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="prod-text">
+          <h3>Ruowen Ring 智能穿戴</h3>
+          <p>轻至 4 克的智能指环，全天候监测心率、睡眠与活动，无感佩戴，把健康数据变成可执行的建议。</p>
+          <div class="taglist"><span class="tag">4g 超轻</span><span class="tag">7天续航</span><span class="tag">健康洞察</span></div>
+          <a class="link-more" href="products.html">了解全部产品
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Stat band ===== -->
+  <section class="section">
+    <div class="container">
+      <div class="statband reveal">
+        <div class="item"><div class="n"><span data-count="80">0</span><span class="u">+</span></div><div class="t">研发工程师</div></div>
+        <div class="item"><div class="n"><span data-count="120">0</span></div><div class="t">专利与软著</div></div>
+        <div class="item"><div class="n"><span data-count="50">0</span><span class="u">万</span></div><div class="t">在线连接设备</div></div>
+        <div class="item"><div class="n"><span data-count="99">0</span><span class="u">.9%</span></div><div class="t">平台可用性</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Solutions / service teaser ===== -->
+  <section class="section section--mist">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">合作模式</span>
+        <h2 class="section-title">为不同伙伴，提供灵活的智能方案</h2>
+      </div>
+      <div class="grid grid--3" style="margin-top:48px">
+        <div class="card feature reveal d1">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l9-4 9 4-9 4-9-4Z" stroke-linejoin="round"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4" stroke-linejoin="round"/></svg></span>
+          <h3>硬件定制</h3>
+          <p>从模组到整机，提供 ODM / 联合研发服务，加速产品落地。</p>
+        </div>
+        <div class="card feature reveal d2">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" stroke-linejoin="round"/><path d="M10 7h4M10 17h4M7 10v4M17 10v4" stroke-linecap="round"/></svg></span>
+          <h3>平台接入</h3>
+          <p>开放设备接入与数据能力，让既有产品快速拥有智能联动。</p>
+        </div>
+        <div class="card feature reveal d3">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a9 9 0 1 0 9 9" stroke-linecap="round"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 4v4h-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h3>持续运营</h3>
+          <p>远程 OTA、算法迭代与运维看板，陪伴产品全生命周期。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="section">
+    <div class="container">
+      <div class="cta reveal">
+        <h2>让我们一起，把生活变得更聪明一点</h2>
+        <p>无论你是寻求硬件合作、平台接入，还是想了解若紊的产品，我们都期待与你对话。</p>
+        <div class="hero__actions">
+          <a class="btn btn--light" href="contact.html">联系我们
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn--ghost" style="color:#fff;border-color:rgba(255,255,255,.35)" href="products.html">浏览产品</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <a class="brand" href="index.html">
+            <span class="brand__mark"><svg viewBox="0 0 64 64" fill="none"><path d="M20 44V20h11a9 9 0 0 1 0 18H20" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="44" cy="44" r="5" fill="#fff"/></svg></span>
+            <span class="brand__name">若紊科技<small>RUOWEN TECH</small></span>
+          </a>
+          <p class="footer__about">上海若紊科技有限公司 · 专注于智能生活周边设备的研发与创新，让科技自然融入日常。</p>
+        </div>
+        <div class="footer__col">
+          <h5>导航</h5>
+          <a href="index.html">首页</a>
+          <a href="about.html">关于我们</a>
+          <a href="products.html">产品服务</a>
+          <a href="news.html">新闻动态</a>
+          <a href="recruit.html">加入我们</a>
+          <a href="admin/">后台管理</a>
+          <a href="contact.html">联系我们</a>
+        </div>
+        <div class="footer__col">
+          <h5>产品</h5>
+          <a href="products.html">智能家居中枢</a>
+          <a href="products.html">智能穿戴</a>
+          <a href="products.html">环境传感器</a>
+          <a href="offical-website/software-list.html">软件下载</a>
+        </div>
+        <div class="footer__col">
+          <h5>联系</h5>
+          <a href="contact.html">合作咨询</a>
+          <a href="mailto:contact@ruowen-tech.com">contact@ruowen-tech.com</a>
+          <a href="contact.html">上海市 · 浦东新区</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <div>© <span data-year>2026</span> 上海若紊科技有限公司 保留所有权利</div>
+        <div class="footer__social">
+          <a href="contact.html" aria-label="微信"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="10" r="6"/><circle cx="16" cy="14" r="5"/></svg></a>
+          <a href="contact.html" aria-label="邮箱"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a href="contact.html" aria-label="电话"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
 </body>
 </html>
