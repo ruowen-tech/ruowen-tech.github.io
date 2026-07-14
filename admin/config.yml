@@ -14,7 +14,7 @@ backend:
   repo: ruowen-tech/ruowen-tech.github.io
   branch: master
   # 部署 Worker 后，把下面 base_url 改成你的 Worker 地址（含 https）：
-  base_url: https://ruowen-decap-proxy.workers.dev
+  base_url: https://ruowen-decap-proxy.spt-genius.workers.dev
   auth_endpoint: auth
   # 仓库为公开仓库时用 public_repo 即可；若为私有仓库，把 Worker 的 scope 改为 repo
   site_url: https://www.wonderingwall.com
