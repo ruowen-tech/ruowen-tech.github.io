@@ -50,7 +50,7 @@
           document.documentElement.className += " i18n-pre";
           var raw = localStorage.getItem("rw_i18n_cache_" + lang);
           if (raw) { window.__i18nCache = {}; window.__i18nCache[lang] = JSON.parse(raw); }
-          setTimeout(function () { document.documentElement.classList.remove("i18n-pre"); }, 3000);
+          setTimeout(function () { document.documentElement.classList.remove("i18n-pre"); }, 500);
         }
       } catch (e) {}
     })();
