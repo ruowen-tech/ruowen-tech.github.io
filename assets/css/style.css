@@ -433,7 +433,10 @@ button, input, textarea, select { font: inherit; color: inherit; }
   .grid--3, .grid--2, .grid--4, .value-grid, .process, .prod-grid, .mission-grid, .statband { grid-template-columns: 1fr; }
   .footer__top { grid-template-columns: 1fr; }
   .footer__bottom { flex-direction: column; align-items: flex-start; }
-  .footer__util { flex-wrap: wrap; gap: 12px; }
+  /* 语言选择器与社交图标始终同一行：不拆开换行；窄屏隐藏“语言”标签以保间距 */
+  .footer__util { flex-wrap: nowrap; gap: 12px; }
+  .footer__lang label { display: none; }
+  .lang-select { padding: 7px 30px 7px 14px; }
   .field.row2 { grid-template-columns: 1fr; }
   .hero__stats { gap: 28px; }
 }
