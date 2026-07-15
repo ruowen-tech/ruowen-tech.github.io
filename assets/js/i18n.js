@@ -9,11 +9,11 @@
 (function () {
   "use strict";
 
-  // 支持的语言（单一数据源）：新增语言只需在此追加一项，并新建 assets/data/{code}.json
+  // 支持的语言（单一数据源）：新增语言只需在此追加一项（code/label/flag），并新建 assets/data/{code}.json
   var LANGS = [
-    { code: "zh", label: "中文" },
-    { code: "en", label: "English" },
-    { code: "ja", label: "日本語" }
+    { code: "zh", label: "中文",    flag: "🇨🇳" },
+    { code: "en", label: "English", flag: "🇺🇸" },
+    { code: "ja", label: "日本語",   flag: "🇯🇵" }
   ];
   var STORAGE_KEY = "rw_lang";
   var BASE = (typeof window.RW_I18N_BASE === "string") ? window.RW_I18N_BASE : "assets/data/";
@@ -81,7 +81,7 @@
     var sel = document.getElementById("langSwitch");
     if (!sel) return;
     sel.innerHTML = LANGS.map(function (l) {
-      return '<option value="' + l.code + '">' + l.label + "</option>";
+      return '<option value="' + l.code + '">' + l.flag + "  " + l.label + "</option>";
     }).join("");
     sel.value = current;
     sel.addEventListener("change", function () { setLang(sel.value); });
