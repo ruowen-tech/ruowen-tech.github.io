@@ -225,7 +225,11 @@
     "status_required_msg": "请填写留言内容",
     "status_sending": "正在提交…",
     "status_ok": "提交成功！我们的团队会在 1 个工作日内与您联系。",
-    "status_fail": "提交失败，请稍后重试，或直接发邮件至 contact@wonderingwall.com。"
+    "status_fail": "提交失败，请稍后重试，或直接发邮件至 contact@wonderingwall.com。",
+    "ph_name": "您的姓名 / 公司",
+    "ph_phone": "便于回拨的号码",
+    "ph_email": "name@example.com",
+    "ph_message": "简单描述您的产品想法或合作需求……"
   },
   "recruit": {
     "hero_eyebrow": "加入我们",

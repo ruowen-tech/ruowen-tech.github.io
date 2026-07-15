@@ -225,7 +225,11 @@
     "status_required_msg": "Please enter your message",
     "status_sending": "Submitting…",
     "status_ok": "Submitted successfully! Our team will contact you within 1 business day.",
-    "status_fail": "Submission failed. Please try again later, or email contact@wonderingwall.com directly."
+    "status_fail": "Submission failed. Please try again later, or email contact@wonderingwall.com directly.",
+    "ph_name": "Your name / company",
+    "ph_phone": "A number we can call back",
+    "ph_email": "name@example.com",
+    "ph_message": "Briefly describe your product idea or partnership needs…"
   },
   "recruit": {
     "hero_eyebrow": "Careers",

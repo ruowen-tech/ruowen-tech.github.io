@@ -225,7 +225,11 @@
     "status_required_msg": "メッセージを入力してください",
     "status_sending": "送信中…",
     "status_ok": "送信完了！担当チームが 1 営業日以内にご連絡します。",
-    "status_fail": "送信に失敗しました。後ほど再度お試しいただくか、contact@wonderingwall.com までメールでお問い合わせください。"
+    "status_fail": "送信に失敗しました。後ほど再度お試しいただくか、contact@wonderingwall.com までメールでお問い合わせください。",
+    "ph_name": "お名前 / 会社名",
+    "ph_phone": "折り返し連絡できる電話番号",
+    "ph_email": "name@example.com",
+    "ph_message": "製品のアイデアや提携のご要望を簡単にご記入ください……"
   },
   "recruit": {
     "hero_eyebrow": "採用情報",

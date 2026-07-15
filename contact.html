@@ -74,16 +74,16 @@
             <div class="field row2">
               <div>
                 <label for="name"><span data-i18n="contact.l_name">称呼</span> <span class="req">*</span></label>
-                <input id="name" name="name" type="text" placeholder="您的姓名 / 公司" autocomplete="name" />
+                <input id="name" name="name" type="text" data-i18n-placeholder="contact.ph_name" placeholder="您的姓名 / 公司" autocomplete="name" />
               </div>
               <div>
                 <label for="phone" data-i18n="contact.l_phone">电话</label>
-                <input id="phone" name="phone" type="tel" placeholder="便于回拨的号码" autocomplete="tel" />
+                <input id="phone" name="phone" type="tel" data-i18n-placeholder="contact.ph_phone" placeholder="便于回拨的号码" autocomplete="tel" />
               </div>
             </div>
             <div class="field">
               <label for="email"><span data-i18n="contact.l_email">邮箱</span> <span class="req">*</span></label>
-              <input id="email" name="email" type="email" placeholder="name@example.com" autocomplete="email" />
+              <input id="email" name="email" type="email" data-i18n-placeholder="contact.ph_email" placeholder="name@example.com" autocomplete="email" />
             </div>
             <div class="field">
               <label for="topic" data-i18n="contact.l_topic">咨询类型</label>
@@ -96,7 +96,7 @@
             </div>
             <div class="field">
               <label for="message"><span data-i18n="contact.l_message">需求描述</span> <span class="req">*</span></label>
-              <textarea id="message" name="message" placeholder="简单描述您的产品想法或合作需求……"></textarea>
+              <textarea id="message" name="message" data-i18n-placeholder="contact.ph_message" placeholder="简单描述您的产品想法或合作需求……"></textarea>
             </div>
             <button class="btn btn--primary" type="submit" style="width:100%"><span data-i18n="contact.submit">提交咨询</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
