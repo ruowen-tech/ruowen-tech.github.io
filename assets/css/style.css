@@ -176,6 +176,9 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .lang-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47,107,255,.35); }
 .lang-select option { color: #0b0f17; background: #fff; }
 
+/* 非中文语言：初始隐藏正文，避免先闪现中文（i18n 应用后由 JS 移除 .i18n-pre） */
+.i18n-pre body { visibility: hidden; }
+
 .nav__toggle { display: none; width: 44px; height: 44px; border: none; background: transparent;
   cursor: pointer; position: relative; }
 .nav__toggle span { position: absolute; left: 11px; right: 11px; height: 2px; background: #fff; border-radius: 2px; transition: .3s var(--ease); }

@@ -7,6 +7,20 @@
   <meta name="description" content="联系上海若紊科技：合作咨询、硬件定制与平台接入。地址上海市浦东新区，邮箱 contact@wonderingwall.com。" />
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <script>
+    /* 防止非中文语言下页面先闪现中文：提前隐藏正文，待 i18n 应用后再显示 */
+    (function () {
+      try {
+        var lang = localStorage.getItem("rw_lang") || "zh";
+        if (lang && lang !== "zh") {
+          document.documentElement.className += " i18n-pre";
+          var raw = localStorage.getItem("rw_i18n_cache_" + lang);
+          if (raw) { window.__i18nCache = {}; window.__i18nCache[lang] = JSON.parse(raw); }
+          setTimeout(function () { document.documentElement.classList.remove("i18n-pre"); }, 3000);
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 

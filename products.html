@@ -7,6 +7,20 @@
   <meta name="description" content="若紊科技产品服务：智能家居中枢、智能穿戴、环境传感器与开放平台，提供硬件定制、平台接入与持续运营的一体化方案。" />
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <script>
+    /* 防止非中文语言下页面先闪现中文：提前隐藏正文，待 i18n 应用后再显示 */
+    (function () {
+      try {
+        var lang = localStorage.getItem("rw_lang") || "zh";
+        if (lang && lang !== "zh") {
+          document.documentElement.className += " i18n-pre";
+          var raw = localStorage.getItem("rw_i18n_cache_" + lang);
+          if (raw) { window.__i18nCache = {}; window.__i18nCache[lang] = JSON.parse(raw); }
+          setTimeout(function () { document.documentElement.classList.remove("i18n-pre"); }, 3000);
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 

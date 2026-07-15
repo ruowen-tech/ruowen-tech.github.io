@@ -53,13 +53,20 @@
     var sel = document.getElementById("langSwitch");
     if (sel) sel.value = current;
     document.documentElement.setAttribute("lang", HTML_LANG[current] || current);
+    // 翻译已应用：移除“防中文闪烁”的隐藏标记（由 <head> 内联脚本添加）
+    document.documentElement.classList.remove("i18n-pre");
   }
 
   function load(code) {
     if (cache[code]) return Promise.resolve(cache[code]);
     return fetch(BASE + code + ".json", { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (d) { cache[code] = d; return d; })
+      .then(function (d) {
+        cache[code] = d;
+        // 缓存到 localStorage，供后续页面同步应用（消除切换语言时的中文闪烁）
+        try { localStorage.setItem("rw_i18n_cache_" + code, JSON.stringify(d)); } catch (e) {}
+        return d;
+      })
       .catch(function (e) {
         console.warn("[i18n] 加载语言包失败:", code, e);
         return cache[code] || {};
@@ -101,11 +108,26 @@
 
   function init() {
     renderSelector();
-    load(current).then(function (dict) {
-      apply(dict);
+    // 若 <head> 内联脚本已把缓存字典放进 window.__i18nCache，则同步应用，彻底避免中文闪烁
+    var pre = window.__i18nCache && window.__i18nCache[current];
+    if (pre) {
+      cache[current] = pre;
+      apply(pre);
       ready = true;
-      window.dispatchEvent(new CustomEvent("i18n:ready", { detail: { lang: current, dict: dict } }));
-    });
+      window.dispatchEvent(new CustomEvent("i18n:ready", { detail: { lang: current, dict: pre } }));
+      // 后台静默刷新缓存
+      load(current).then(function (d) {
+        cache[current] = d;
+        apply(d);
+        window.dispatchEvent(new CustomEvent("i18n:ready", { detail: { lang: current, dict: d } }));
+      });
+    } else {
+      load(current).then(function (dict) {
+        apply(dict);
+        ready = true;
+        window.dispatchEvent(new CustomEvent("i18n:ready", { detail: { lang: current, dict: dict } }));
+      });
+    }
   }
 
   if (document.readyState === "loading") {
