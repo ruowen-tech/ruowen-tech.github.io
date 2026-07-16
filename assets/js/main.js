@@ -29,23 +29,34 @@
   });
 
   /* ---- Scroll reveal ---- */
-  const revealEls = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window && revealEls.length) {
-    const io = new IntersectionObserver(
+  let _revealObserver = null;
+  function getRevealObserver() {
+    if (_revealObserver) return _revealObserver;
+    if (!("IntersectionObserver" in window)) return null;
+    _revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add("in");
-            io.unobserve(e.target);
+            _revealObserver.unobserve(e.target);
           }
         });
       },
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
     );
-    revealEls.forEach((el) => io.observe(el));
-  } else {
-    revealEls.forEach((el) => el.classList.add("in"));
+    return _revealObserver;
   }
+  // 暴露全局：供 news.js / jobs.js 在动态渲染后把新卡片加入显形监听
+  window.revealObserve = function (els) {
+    const obs = getRevealObserver();
+    if (!obs) {
+      Array.prototype.forEach.call(els, (el) => el.classList.add("in"));
+      return;
+    }
+    Array.prototype.forEach.call(els, (el) => obs.observe(el));
+  };
+  // 初始：监听页面加载时已存在的静态 .reveal 元素
+  window.revealObserve(document.querySelectorAll(".reveal"));
 
   /* ---- Animated stat counters ---- */
   const counters = document.querySelectorAll("[data-count]");
