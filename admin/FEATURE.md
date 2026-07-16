@@ -266,3 +266,25 @@ GitHub Pages 经 Cloudflare 时，静态资源（`preview.js`/`cms.css`/`config.
 
 ### 经验
 后台静态资源分两类都要加版本戳防 Cloudflare 缓存：① 直接 `<script>/<link>` 引用的 preview.js / cms.css；② manual init 里 `fetch()` 的 config.yml（它同样走 CDN 缓存）。改动后版本号 +1，并让用户硬清缓存/开无痕验证。
+
+## 14. 重大更正：去掉 Manual Init，修复 "collections names must be unique"（2026-07-16，提交 ba9274a）
+
+现象：后台报致命 `Config Errors: 'collections' collections names must be unique`，但线上 `config.yml` 经 `curl` 确认 collection/file 的 `name` 完全唯一（news/jobs/news-data/jobs-data 无重复）。报错栈指向 `preview.js` 的 `CMS.init({config})`（manual init 路径）。
+
+### 根因（推翻第 10/11/12/13 节关于 manual init 的结论）
+- 第 10 节起误判「自定义控件必须先注册再 init，故必需 Manual Init」。实际 Decap **不会同步 init**：`decap-cms.js` 加载后同步设置 `window.CMS`，但**异步** `fetch` 同目录 `config.yml` 加载完才 init；`preview.js`（在其后引入）**同步**执行注册，早于该异步 init。因此**根本不需要 Manual Init**，早前的 "No control" 真凶只是 `window.React`（第 11 节已修），与注册时机无关。
+- manual init 下自行 `fetch("config.yml")+CMS.init({config})` 触发 Decap 对 config 的重复/异常校验，报 "collections names must be unique"——config 本身正确，问题在手动加载路径。
+
+### 修复
+- `admin/index.html`：删除 `window.CMS_MANUAL_INIT = true` 开关与 js-yaml `<script>`；`decap-cms.js` 之后仅引入 `cms.css?v=3` 与 `preview.js?v=4`。
+- `admin/preview.js`：删除 manual init / `fetch("config.yml")` / `CMS.init` 整段，只保留控件与预览注册（同步完成，早于 Decap 异步 init）。
+- 版本戳 bump：`preview.js?v=4`、`cms.css?v=3` 破除 Cloudflare 缓存。
+
+### 验证
+后台强刷后应正常进入，无 config 错误、无 "No control"；新建新闻日期行隐藏且自动填当天、右侧实时预览正常。
+
+### 经验（最终版，覆盖前文）
+1. Decap 自定义控件/预览：一律 `window.h` + `window.createClass`，绝不要 `window.React`。
+2. **不要用 Manual Init / 不要自己 `fetch("config.yml")` + `CMS.init`**——会触发 "collections names must be unique"。Decap 自动异步加载 config 即可，`preview.js` 放在 `decap-cms.js` 之后同步注册。
+3. 改后台静态资源加 `?v` 版本戳破 Cloudflare 缓存（直接引用的 preview.js/cms.css；**不再需要**给 fetch 的 config.yml 加戳，因为不走手动 fetch）。
+4. 诊断先 `curl` 线上文件确认源站版本，再让用户硬清缓存/开无痕窗口验证。
