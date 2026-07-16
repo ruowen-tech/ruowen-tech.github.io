@@ -22,6 +22,9 @@ backend:
 media_folder: "content/uploads"
 public_folder: "/content/uploads"
 
+# 后台美化样式（品牌色顶栏、预览排版）由 admin/index.html 引入 admin/cms.css
+# 实时预览模板由 admin/preview.js 注册（news / jobs 集合）
+
 collections:
   - name: "news"
     label: "新闻动态"
@@ -29,19 +32,49 @@ collections:
       - name: "news-data"
         label: "新闻列表"
         file: "content/news.json"
+        preview: true
         fields:
           - name: items
             label: "新闻条目"
             widget: list
             summary: "{{fields.title}}"
             fields:
-              - { name: id, label: "ID", widget: string }
-              - { name: title, label: "标题", widget: string }
-              - { name: date, label: "日期", widget: date }
-              - { name: category, label: "分类", widget: select, options: ["公司动态", "产品发布", "技术分享", "合作生态", "行业动态"] }
-              - { name: emoji, label: "图标 Emoji", widget: string, required: false }
-              - { name: summary, label: "摘要", widget: text, required: false }
-              - { name: body, label: "正文", widget: markdown }
+              - name: id
+                label: "ID"
+                widget: string
+                hint: "（必填）唯一标识，建议格式 n + 年月日，如 n20260716"
+              - name: title
+                label: "标题"
+                widget: string
+                hint: "（必填）新闻标题"
+              - name: date
+                label: "日期"
+                widget: date
+                hint: "（必填）发布日期，格式 YYYY-MM-DD"
+              - name: category
+                label: "分类"
+                widget: select
+                options: ["公司动态", "产品发布", "技术分享", "合作生态", "行业动态"]
+                hint: "（必填）用于前台分类筛选与标签"
+              - name: emoji
+                label: "图标 Emoji"
+                widget: string
+                required: false
+                hint: "（选填）卡片封面 emoji，留空则显示默认 📰"
+              - name: cover
+                label: "封面图片"
+                widget: image
+                required: false
+                hint: "（选填）上传封面图，存在时优先于 emoji 展示；图片存入 content/uploads"
+              - name: summary
+                label: "摘要"
+                widget: text
+                required: false
+                hint: "（选填）列表页摘要，建议一句话"
+              - name: body
+                label: "正文"
+                widget: markdown
+                hint: "（必填）正文，支持 Markdown 与换行"
 
   - name: "jobs"
     label: "招聘职位"
@@ -49,21 +82,50 @@ collections:
       - name: "jobs-data"
         label: "职位列表"
         file: "content/jobs.json"
+        preview: true
         fields:
           - name: items
             label: "职位条目"
             widget: list
             summary: "{{fields.title}}"
             fields:
-              - { name: id, label: "ID", widget: string }
-              - { name: title, label: "职位名称", widget: string }
-              - { name: dept, label: "部门", widget: string }
-              - { name: location, label: "工作地点", widget: string }
-              - { name: type, label: "用工类型", widget: select, options: ["全职", "兼职", "实习"] }
-              - { name: salary, label: "薪资", widget: string, required: false }
-              - { name: desc, label: "岗位职责", widget: text, required: false }
+              - name: id
+                label: "ID"
+                widget: string
+                hint: "（必填）唯一标识，建议格式 j + 序号，如 j2026007"
+              - name: title
+                label: "职位名称"
+                widget: string
+                hint: "（必填）职位名称"
+              - name: dept
+                label: "部门"
+                widget: string
+                hint: "（必填）所属部门，如 研发部 / 算法部"
+              - name: location
+                label: "工作地点"
+                widget: string
+                hint: "（必填）工作地点，如 上海"
+              - name: type
+                label: "用工类型"
+                widget: select
+                options: ["全职", "兼职", "实习"]
+                hint: "（必填）全职 / 兼职 / 实习"
+              - name: salary
+                label: "薪资"
+                widget: string
+                required: false
+                hint: "（选填）薪资范围，如 25-45K"
+              - name: desc
+                label: "岗位职责"
+                widget: text
+                required: false
+                hint: "（选填）岗位职责简述"
               - name: requirements
                 label: "任职要求"
                 widget: list
                 required: false
-                field: { name: item, label: "要求", widget: string }
+                field:
+                  name: item
+                  label: "要求"
+                  widget: string
+                hint: "（选填）逐条添加任职要求"

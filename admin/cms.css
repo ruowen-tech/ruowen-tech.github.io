@@ -1,0 +1,118 @@
+/* =========================================================
+   上海若紊科技 · Decap CMS 后台自定义样式
+   在 admin/index.html 中于 decap-cms.js 之后加载，覆盖默认外观
+   主色与官网一致：--accent #2f6bff / 渐变 120deg #2f6bff→#18c8ff
+   ========================================================= */
+:root {
+  --rw-accent: #2f6bff;
+  --rw-accent-700: #1d4fd6;
+  --rw-accent-2: #18c8ff;
+  --rw-accent-grad: linear-gradient(120deg, #2f6bff 0%, #18c8ff 100%);
+  --rw-ink: #1a2233;
+  --rw-muted: #6b7689;
+  --rw-line: #e7ebf2;
+  --rw-bg: #f5f7fb;
+}
+
+/* ---- 顶栏品牌化 ---- */
+.nc-topbar,
+.nc-topbar .nc-topbar-site-name {
+  background: var(--rw-accent-grad) !important;
+  color: #fff !important;
+}
+.nc-topbar { box-shadow: 0 2px 14px rgba(47, 107, 255, .25) !important; }
+.nc-topbar .nc-topbar-link,
+.nc-topbar a { color: #fff !important; }
+
+/* ---- 主按钮 ---- */
+.nc-btn-primary,
+.nc-editor-toolbar .nc-btn-primary {
+  background: var(--rw-accent-grad) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 20px -10px rgba(47, 107, 255, .7) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.nc-btn-primary:hover { filter: brightness(1.05); }
+
+/* 选中/激活态（列表、标签） */
+.nc-list-item.active,
+.nc-pagination .nc-pagination-item.active { border-color: var(--rw-accent) !important; }
+
+/* ---- 字段标签更清晰 ---- */
+.nc-label {
+  font-weight: 600 !important;
+  color: var(--rw-ink) !important;
+  font-size: 13px !important;
+}
+/* 必填字段的星号着色 */
+.nc-field > .nc-label::after,
+.nc-object .nc-label::after { color: #e5484d !important; }
+
+/* 字段说明（hint）更柔和 */
+.nc-field-hint {
+  color: var(--rw-muted) !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+}
+
+/* ---- 预览区排版 ---- */
+.nc-previewPane-content,
+.nc-previewPane-frame {
+  background: var(--rw-bg) !important;
+  padding: 0 !important;
+}
+.nc-previewPane-content { padding: 20px !important; }
+
+/* =========================================================
+   预览组件样式（由 admin/preview.js 渲染）
+   ========================================================= */
+.rw-preview { max-width: 760px; margin: 0 auto; }
+.rw-preview__hint {
+  font-size: 12px; color: var(--rw-muted);
+  background: #eef3ff; border: 1px solid #dbe6ff;
+  padding: 8px 12px; border-radius: 8px; margin-bottom: 18px;
+}
+.rw-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+.rw-card {
+  background: #fff; border: 1px solid var(--rw-line);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 6px 20px -14px rgba(26, 34, 51, .35);
+}
+.rw-card__cover {
+  height: 120px; display: grid; place-items: center;
+  font-size: 44px; background: var(--rw-accent-grad); color: #fff;
+}
+.rw-card__cover--img img { width: 100%; height: 120px; object-fit: cover; display: block; }
+.rw-card__body { padding: 14px 16px 18px; }
+.rw-card__meta {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 12px; color: var(--rw-muted); margin-bottom: 8px;
+}
+.rw-card__body h3 { margin: 0 0 6px; font-size: 16px; color: var(--rw-ink); line-height: 1.4; }
+.rw-card__body p { margin: 0; font-size: 13px; color: var(--rw-muted); line-height: 1.6; }
+.rw-card__more { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--rw-accent); }
+
+/* 招聘预览 */
+.rw-job {
+  background: #fff; border: 1px solid var(--rw-line);
+  border-radius: 12px; padding: 16px 18px; margin-bottom: 14px;
+  box-shadow: 0 6px 20px -16px rgba(26, 34, 51, .4);
+}
+.rw-job__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.rw-job__title { font-size: 16px; font-weight: 700; color: var(--rw-ink); }
+.rw-job__tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.rw-job__desc { margin: 10px 0; font-size: 13px; color: var(--rw-muted); line-height: 1.6; }
+.rw-job__req { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--rw-ink); line-height: 1.7; }
+
+/* 通用 pill（分类/标签） */
+.pill {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  font-size: 12px; background: #eef3ff; color: var(--rw-accent-700);
+}
+.pill--cat { background: var(--rw-accent-grad); color: #fff; }
+.pill--sal { background: #fff4e6; color: #c2630a; }

@@ -46,9 +46,13 @@
     if (!list.length) { grid.innerHTML = ""; empty.style.display = "block"; return; }
     empty.style.display = "none";
     grid.innerHTML = list.map(function (n) {
+      var cover = U.esc(n.cover || "");
+      var coverNode = cover
+        ? '<div class="news-card__cover news-card__cover--img"><img src="' + cover + '" alt=""></div>'
+        : '<div class="news-card__cover"><span>' + U.esc(n.emoji || "📰") + "</span></div>";
       return '' +
         '<article class="news-card reveal" data-id="' + U.esc(n.id) + '">' +
-          '<div class="news-card__cover"><span>' + U.esc(n.emoji || "📰") + "</span></div>" +
+          coverNode +
           '<div class="news-card__body">' +
             '<div class="news-card__meta">' +
               '<span class="pill pill--cat">' + U.esc(catLabel(n.category || "动态")) + "</span>" +
