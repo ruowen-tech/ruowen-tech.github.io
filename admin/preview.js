@@ -1,155 +1,175 @@
 /* =========================================================
    上海若紊科技 · Decap CMS 预览模板（实时渲染，免等部署）
    - 必须在 decap-cms.js 之后加载（admin/index.html 已按顺序引入）
-   - 重要：Decap 仅暴露 window.CMS / window.h(=React.createElement) /
-     window.createClass，并不暴露 window.React。故此处一律用 h 与
-     createClass 编写组件，不可使用 window.React。
+   - Decap 仅暴露 window.CMS / window.h(=React.createElement) /
+     window.createClass，并不暴露 window.React。故一律用 h 与 createClass。
+   - 采用「轮询就绪」机制：若 Decap 全局 API 因加载/缓存/慢网络时序未
+     就绪，自动重试，避免一次性 guard 失败导致控件与预览永不注册。
    ========================================================= */
 (function () {
   "use strict";
-  var CMS = window.CMS;
-  var h = window.h;
-  var createClass = window.createClass;
-  if (!CMS || !h || !createClass) {
-    console.error("[preview] Decap CMS / h / createClass 未就绪，预览模板未注册");
-    return;
-  }
 
-  /* ---------- 自动日期控件 autoDate ----------
-     新闻新建时自动设为今天（YYYY-MM-DD），不可手填，表单中由 CSS 隐藏。
-     仅在值为空时写入今天；已有日期（旧数据）保持不变。 */
   function todayStr() {
     var d = new Date();
     var p = function (n) { return (n < 10 ? "0" : "") + n; };
     return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
   }
-  var AutoDateControl = createClass({
-    componentDidMount: function () {
-      if (!this.props.value) this.props.onChange(todayStr());
-    },
-    render: function () {
-      // 整行由 cms.css 隐藏；此处仅占位，不渲染任何可见文字
-      return h("div", { className: "rw-autodate", style: { display: "none" } });
+
+  var booted = false;
+
+  function boot() {
+    if (booted) return;
+    var CMS = window.CMS;
+    var h = window.h;
+    var createClass = window.createClass;
+    // 全局 API 未就绪（脚本加载/缓存/慢网络时序），等下次轮询再试
+    if (!CMS || !h || !createClass) return;
+
+    booted = true;
+
+    /* ---------- 自动日期控件 autoDate ----------
+       新闻新建时自动设为今天（YYYY-MM-DD），不可手填，表单中由 CSS 隐藏。
+       仅在值为空时写入今天；已有日期（旧数据）保持不变。 */
+    var AutoDateControl = createClass({
+      componentDidMount: function () {
+        if (!this.props.value) this.props.onChange(todayStr());
+      },
+      render: function () {
+        // 整行由 cms.css 隐藏；此处仅占位，不渲染任何可见文字
+        return h("div", { className: "rw-autodate", style: { display: "none" } });
+      }
+    });
+    if (CMS.registerWidget) {
+      CMS.registerWidget(
+        "autoDate",
+        AutoDateControl,
+        function (props) { return h("span", null, props.value || ""); }
+      );
+      console.log("[preview] 自动日期控件 autoDate 已注册");
     }
-  });
 
-  if (CMS.registerWidget) {
-    CMS.registerWidget(
-      "autoDate",
-      AutoDateControl,
-      function (props) { return h("span", null, props.value || ""); }
-    );
-    console.log("[preview] 自动日期控件 autoDate 已注册");
-  }
-
-  /* ---------- 新闻预览 ---------- */
-  function NewsPreview(props) {
-    var data = props.entry.get("data");
-    var items = data.get("items");
-    if (!items) items = [];
-    var cards = items.map(function (it, i) {
-      var emoji = it.get("emoji") || "📰";
-      var cover = it.get("cover");
-      var coverNode = cover
-        ? h("div", { className: "rw-card__cover rw-card__cover--img" }, h("img", { src: cover, alt: "" }))
-        : h("div", { className: "rw-card__cover" }, h("span", null, emoji));
-      return h(
-        "article",
-        { className: "rw-card", key: i },
-        coverNode,
-        h(
-          "div",
-          { className: "rw-card__body" },
+    /* ---------- 新闻预览 ---------- */
+    function NewsPreview(props) {
+      var data = props.entry.get("data");
+      var items = data.get("items");
+      if (!items) items = [];
+      var cards = items.map(function (it, i) {
+        var emoji = it.get("emoji") || "📰";
+        var cover = it.get("cover");
+        var coverNode = cover
+          ? h("div", { className: "rw-card__cover rw-card__cover--img" }, h("img", { src: cover, alt: "" }))
+          : h("div", { className: "rw-card__cover" }, h("span", null, emoji));
+        return h(
+          "article",
+          { className: "rw-card", key: i },
+          coverNode,
           h(
             "div",
-            { className: "rw-card__meta" },
-            h("span", { className: "pill pill--cat" }, it.get("category") || "动态"),
-            h("span", null, it.get("date") || "")
-          ),
-          h("h3", null, it.get("title") || "（未填标题）"),
-          h("p", null, it.get("summary") || ""),
-          h("span", { className: "rw-card__more" }, "阅读全文 →")
-        )
-      );
-    });
-    return h(
-      "div",
-      { className: "rw-preview" },
-      h("div", { className: "rw-preview__hint" }, "实时预览 · 保存后约 1 分钟同步到官网。"),
-      h("div", { className: "rw-grid" }, cards)
-    );
-  }
-
-  /* ---------- 招聘预览 ---------- */
-  function JobsPreview(props) {
-    var data = props.entry.get("data");
-    var items = data.get("items");
-    if (!items) items = [];
-    var jobs = items.map(function (j, i) {
-      var reqs = j.get("requirements") || [];
-      var reqNodes = reqs.map(function (r, k) {
-        return h("li", { key: k }, r);
+            { className: "rw-card__body" },
+            h(
+              "div",
+              { className: "rw-card__meta" },
+              h("span", { className: "pill pill--cat" }, it.get("category") || "动态"),
+              h("span", null, it.get("date") || "")
+            ),
+            h("h3", null, it.get("title") || "（未填标题）"),
+            h("p", null, it.get("summary") || ""),
+            h("span", { className: "rw-card__more" }, "阅读全文 →")
+          )
+        );
       });
-      var tags = [
-        j.get("dept") ? h("span", { className: "pill", key: "dept" }, j.get("dept")) : null,
-        j.get("location") ? h("span", { className: "pill", key: "loc" }, j.get("location")) : null,
-        j.get("type") ? h("span", { className: "pill", key: "type" }, j.get("type")) : null,
-        j.get("salary") ? h("span", { className: "pill pill--sal", key: "sal" }, j.get("salary")) : null
-      ].filter(Boolean);
       return h(
-        "article",
-        { className: "rw-job", key: i },
-        h(
-          "div",
-          { className: "rw-job__head" },
-          h("div", { className: "rw-job__title" }, j.get("title") || "（未填职位）"),
-          tags.length ? h("div", { className: "rw-job__tags" }, tags) : null
-        ),
-        j.get("desc") ? h("p", { className: "rw-job__desc" }, j.get("desc")) : null,
-        reqNodes.length ? h("ul", { className: "rw-job__req" }, reqNodes) : null
+        "div",
+        { className: "rw-preview" },
+        h("div", { className: "rw-preview__hint" }, "实时预览 · 保存后约 1 分钟同步到官网。"),
+        h("div", { className: "rw-grid" }, cards)
       );
-    });
-    return h(
-      "div",
-      { className: "rw-preview" },
-      h("div", { className: "rw-preview__hint" }, "实时预览 · 保存后约 1 分钟同步到官网。"),
-      jobs
-    );
+    }
+
+    /* ---------- 招聘预览 ---------- */
+    function JobsPreview(props) {
+      var data = props.entry.get("data");
+      var items = data.get("items");
+      if (!items) items = [];
+      var jobs = items.map(function (j, i) {
+        var reqs = j.get("requirements") || [];
+        var reqNodes = reqs.map(function (r, k) {
+          return h("li", { key: k }, r);
+        });
+        var tags = [
+          j.get("dept") ? h("span", { className: "pill", key: "dept" }, j.get("dept")) : null,
+          j.get("location") ? h("span", { className: "pill", key: "loc" }, j.get("location")) : null,
+          j.get("type") ? h("span", { className: "pill", key: "type" }, j.get("type")) : null,
+          j.get("salary") ? h("span", { className: "pill pill--sal", key: "sal" }, j.get("salary")) : null
+        ].filter(Boolean);
+        return h(
+          "article",
+          { className: "rw-job", key: i },
+          h(
+            "div",
+            { className: "rw-job__head" },
+            h("div", { className: "rw-job__title" }, j.get("title") || "（未填职位）"),
+            tags.length ? h("div", { className: "rw-job__tags" }, tags) : null
+          ),
+          j.get("desc") ? h("p", { className: "rw-job__desc" }, j.get("desc")) : null,
+          reqNodes.length ? h("ul", { className: "rw-job__req" }, reqNodes) : null
+        );
+      });
+      return h(
+        "div",
+        { className: "rw-preview" },
+        h("div", { className: "rw-preview__hint" }, "实时预览 · 保存后约 1 分钟同步到官网。"),
+        jobs
+      );
+    }
+
+    CMS.registerPreviewTemplate("news", NewsPreview);
+    CMS.registerPreviewTemplate("news-data", NewsPreview);
+    CMS.registerPreviewTemplate("jobs", JobsPreview);
+    CMS.registerPreviewTemplate("jobs-data", JobsPreview);
+    console.log("[preview] 新闻/招聘预览模板与 autoDate 控件已注册");
+
+    /* ---------- 手动初始化（Manual Init） ----------
+       开启 CMS_MANUAL_INIT 后 Decap 不再自动初始化，必须由我们在注册完
+       自定义控件/预览后再 CMS.init()，否则会报 "No control for widget 'autoDate'"。
+       UMD 构建下 CMS.init() 不会自动读取 config.yml，故显式 fetch 并解析后传入。 */
+    if (window.CMS_MANUAL_INIT) {
+      var yaml = window.jsyaml;
+      var start = function (config) {
+        CMS.init(config ? { config: config } : undefined);
+      };
+      if (!yaml) {
+        console.error("[preview] jsyaml 未加载，回退让 Decap 自动读取 config.yml");
+        start();
+        return;
+      }
+      fetch("config.yml")
+        .then(function (r) { return r.text(); })
+        .then(function (text) {
+          try {
+            start(yaml.load(text));
+          } catch (e) {
+            console.error("[preview] 解析 config.yml 失败，回退自动加载", e);
+            start();
+          }
+        })
+        .catch(function (e) {
+          console.error("[preview] 读取 config.yml 失败，回退自动加载", e);
+          start();
+        });
+    }
   }
 
-  CMS.registerPreviewTemplate("news", NewsPreview);
-  CMS.registerPreviewTemplate("news-data", NewsPreview);
-  CMS.registerPreviewTemplate("jobs", JobsPreview);
-  CMS.registerPreviewTemplate("jobs-data", JobsPreview);
-  console.log("[preview] 新闻/招聘预览模板与 autoDate 控件已注册");
-
-  /* ---------- 手动初始化（Manual Init） ----------
-     开启 CMS_MANUAL_INIT 后 Decap 不再自动初始化，必须由我们在注册完
-     自定义控件/预览后再 CMS.init()，否则会报 "No control for widget 'autoDate'"。
-     UMD 构建下 CMS.init() 不会自动读取 config.yml，故显式 fetch 并解析后传入。 */
-  if (window.CMS_MANUAL_INIT) {
-    var yaml = window.jsyaml;
-    var start = function (config) {
-      CMS.init(config ? { config: config } : undefined);
-    };
-    if (!yaml) {
-      console.error("[preview] jsyaml 未加载，回退让 Decap 自动读取 config.yml");
-      start();
+  /* 轮询等待 Decap 全局 API 就绪（最多约 9 秒），就绪即注册，杜绝一次性失败 */
+  function wait(times) {
+    boot();
+    if (booted) return;
+    if (times <= 0) {
+      console.error("[preview] Decap 全局 API 在等待期内未就绪，预览/自定义控件未注册（请刷新重试）");
       return;
     }
-    fetch("config.yml")
-      .then(function (r) { return r.text(); })
-      .then(function (text) {
-        try {
-          start(yaml.load(text));
-        } catch (e) {
-          console.error("[preview] 解析 config.yml 失败，回退自动加载", e);
-          start();
-        }
-      })
-      .catch(function (e) {
-        console.error("[preview] 读取 config.yml 失败，回退自动加载", e);
-        start();
-      });
+    setTimeout(function () { wait(times - 1); }, 150);
   }
+
+  wait(60);
 })();
