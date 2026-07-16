@@ -177,3 +177,28 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 
 - 前端提交记录：`e4074a4` → 改 Resend：`（本提交）`（contact.html 去 EmailJS、main.js 改 POST、worker 加 /api/contact）。
 - ✅ 免费、代码自控、Secret 不暴露浏览器；发件域为自有域名 `wonderingwall.com`（Resend 要求验证域名，已含在第 2 步）。
+
+## 9. 后台管理界面优化（2026-07-16）
+
+目标：解决"保存后等 GitHub Pages 重建才看得到效果"的等待痛点，并提升运营易用性。四项优化全部上线（提交 `d16ff7e`，master/develop 同步）。
+
+### 9.1 实时预览（核心，直击"刷新等待长"）
+- 新增 `admin/preview.js`：用 `window.CMS.registerPreviewTemplate` 为 `news`/`jobs` 集合注册 React 预览组件（同时注册集合名与文件名 `news-data`/`jobs-data` 以兼容 file collection 两种注册方式）。
+- 预览组件读取 `props.entry.get('data').get('items')`，渲染成与官网一致的卡片/职位样式（含分类 pill、日期、emoji/封面图、任职要求列表）。
+- `admin/config.yml` 两个 file 均加 `preview: true`。
+- 编辑时右侧即时渲染，**无需等待部署**即可确认版式与内容。
+
+### 9.2 字段提示与必填/选填标注
+- 每个字段加 `hint`：必填字段标注"（必填）+ 格式示例"（如 ID 命名规则、日期 YYYY-MM-DD），选填字段明确"（选填）可留空"。
+- 运营一眼区分必填/选填，减少填错导致的 "Complete before saving"。
+
+### 9.3 后台界面美化
+- 新增 `admin/cms.css`：品牌色顶栏（渐变 #2f6bff→#18c8ff）、主按钮、预览区浅灰底与卡片排版；`admin/index.html` 在 decap-cms.js 之后引入，关键规则加 `!important` 覆盖 Decap 默认样式。
+
+### 9.4 新闻封面图片上传
+- `news` 集合 items 新增 `cover` 字段（`widget: image`，选填），启用 `content/uploads` 媒体库。
+- 前台 `assets/js/news.js` 与 `style.css`：有 `cover` 时渲染 `<img>`，否则回退 emoji。路径经 `public_folder: /content/uploads` 解析。
+
+### 注意
+- 后台静态资源（index.html / cms.css / preview.js / config.yml）由 GitHub Pages 托管于 `www.wonderingwall.com/admin/`，**改动需等一次 GitHub Pages 重建**才会生效（仅此一次，之后预览即时）。
+- 预览组件依赖 `window.React`（Decap 已内置），若控制台报 "React 未就绪" 说明脚本加载顺序异常。
