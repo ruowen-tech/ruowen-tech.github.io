@@ -88,23 +88,35 @@ export default {
         return new Response("GitHub authorization failed", { status: 401 });
       }
 
-      // 通过 postMessage 把 token 交还给 Decap 后台弹窗
-      // 关键：Decap 弹窗不会向代理窗口回发任何消息，必须拿到 token 后立即回传并关闭窗口。
-      // 之前此处先 addEventListener('message') 等待父窗口回发，导致 token 永不回传、登录卡死，
-      // 表现为"能打开后台却无法进入/增删改内容"。
+      // 通过 postMessage 把 token 交还给 Decap 后台弹窗。
+      // 采用 Decap/Netlify-CMS 官方标准握手：
+      //   1) 弹窗先向 opener 广播 "authorizing:github"（targetOrigin 用 "*"）；
+      //   2) 父窗口(admin 页)收到后会回发一条 message，弹窗据此拿到父窗口真实 origin；
+      //   3) 弹窗用该 origin 作为 targetOrigin 回发 "authorization:github:success:{token}"。
+      // 关键教训：不能用 window.location.origin（=代理域 decap.wonderingwall.com）当 targetOrigin，
+      // 父窗口是 www.wonderingwall.com，origin 不匹配会被浏览器直接丢弃 → 弹窗闪关、登录页无反应。
+      // 兜底：万一父窗口未回发，2 秒后用站点 origin 直接回发，确保稳健。
+      const payloadJson = JSON.stringify({ token: data.access_token, provider: "github" });
       const html = `<!doctype html><html><head><meta charset="utf-8"><title>Authorizing</title></head>
 <body><script>
 (function () {
-  try {
-    window.opener.postMessage(
-      'authorization:github:success:' + JSON.stringify({
-        token: ${JSON.stringify(data.access_token)},
-        provider: "github"
-      }),
-      window.location.origin
-    );
-  } catch (e) {}
-  window.close();
+  var msg = 'authorization:github:success:' + ${JSON.stringify(payloadJson)};
+  var done = false;
+  function send(origin) {
+    if (done) return;
+    done = true;
+    try { window.opener.postMessage(msg, origin); } catch (e) {}
+    setTimeout(function () { window.close(); }, 300);
+  }
+  function receiveMessage(e) {
+    send(e.origin);
+    window.removeEventListener('message', receiveMessage, false);
+  }
+  window.addEventListener('message', receiveMessage, false);
+  // 标准握手：先告诉父窗口"正在授权"，父窗口会回发消息，从而得到其真实 origin
+  try { window.opener.postMessage('authorizing:github', '*'); } catch (e) {}
+  // 兜底：父窗口未回发时，2 秒后用站点 origin 直接回发
+  setTimeout(function () { send('https://www.wonderingwall.com'); }, 2000);
 })();
 </script></body></html>`;
 
