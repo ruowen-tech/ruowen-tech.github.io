@@ -39,8 +39,8 @@ collections:
               - { name: title, label: "标题", widget: string }
               - { name: date, label: "日期", widget: date }
               - { name: category, label: "分类", widget: select, options: ["公司动态", "产品发布", "技术分享", "合作生态", "行业动态"] }
-              - { name: emoji, label: "图标 Emoji", widget: string }
-              - { name: summary, label: "摘要", widget: text }
+              - { name: emoji, label: "图标 Emoji", widget: string, required: false }
+              - { name: summary, label: "摘要", widget: text, required: false }
               - { name: body, label: "正文", widget: markdown }
 
   - name: "jobs"
@@ -60,9 +60,10 @@ collections:
               - { name: dept, label: "部门", widget: string }
               - { name: location, label: "工作地点", widget: string }
               - { name: type, label: "用工类型", widget: select, options: ["全职", "兼职", "实习"] }
-              - { name: salary, label: "薪资", widget: string }
-              - { name: desc, label: "岗位职责", widget: text }
+              - { name: salary, label: "薪资", widget: string, required: false }
+              - { name: desc, label: "岗位职责", widget: text, required: false }
               - name: requirements
                 label: "任职要求"
                 widget: list
+                required: false
                 field: { name: item, label: "要求", widget: string }
