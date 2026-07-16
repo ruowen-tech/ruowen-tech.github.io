@@ -86,6 +86,19 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 - **根因**：`worker/index.js` 的 `/callback` 在换到 `access_token` 后，先 `window.addEventListener("message", receiveMessage)` 等待**父窗口（Decap 弹窗）回发消息**，再 `postMessage` 把 token 交还。但 Decap 的 github 后端弹窗**根本不会**向代理窗口发任何消息——它只被动监听 `authorization:github:success:...`。于是 `receiveMessage` 永不触发，token 永不回传，登录握手卡死。
 - **解决**：把 `/callback` 改成标准 Decap 代理流程——换到 token 后**立即** `window.opener.postMessage("authorization:github:success:" + JSON.stringify({token, provider:"github"}), window.location.origin)`，随后 `window.close()`。不再等待任何父窗口消息。
 - **验证**：`/auth`、`/` 均 302 跳 GitHub（`client_id=Ov23liW90aHanaMyMxPE`、回调 `https://decap.wonderingwall.com/callback`、`scope=public_repo`），`/callback` 无 code 返回 400，符合预期；修复后需重新 `wrangler deploy` 生效（见 `DEPLOY.md`）。
+- **更正（问题 7 补充）**：上面"Decap 弹窗不会回发消息"的结论有误——Decap 标准握手中父窗口**会**回发消息。当时登录失败的真实原因是后续的组织 OAuth 授权限制（问题 6）+ postMessage targetOrigin 错误（问题 7），并非死锁。此版"立即直接回发"的写法因 targetOrigin 用错而引出问题 7。
+
+### 问题 6：组织启用 OAuth App 访问限制 → 保存报 `API_ERROR ... OAuth App access restrictions`
+
+- **现象**：登录后能进后台，但保存内容报红 `Failed to persist entry: API_ERROR: ... the 'ruowen-tech' organization has enabled OAuth App access restrictions ...`。
+- **根因**：`ruowen-tech` 是**组织账号**并开启了「第三方 OAuth App 访问限制」，Decap 的 OAuth App 未获组织批准，GitHub 拒绝一切写入（凭证正确也无效）。属 GitHub 组织级设置，非代码问题。
+- **解决**：组织 Owner 到 `https://github.com/organizations/ruowen-tech/settings/oauth_application_policy` 批准该 OAuth App。注意该页**只列出已发起过访问请求的 App**：若列表里找不到，需先用组织成员账号在后台走一遍登录授权、在 GitHub 授权页对 `ruowen-tech` 点 Request/Grant 以产生请求，App 才会出现，再由 Owner 批准。
+
+### 问题 7：OAuth 回调 postMessage targetOrigin 错误 → 弹窗闪关、授权页无反应
+
+- **现象**：组织授权通过后，点 "Login with GitHub" 弹窗打开即自动关闭，登录页原地不动，进不了后台。
+- **根因**：`/callback` 回发 token 时用 `window.location.origin`（=代理域 `decap.wonderingwall.com`）作为 `postMessage` 的 `targetOrigin`，而接收方父窗口是 `www.wonderingwall.com`，origin 不匹配 → 浏览器丢弃消息 → 父窗口收不到 token；同时 `window.close()` 照常执行 → 弹窗闪关。
+- **解决**：恢复 Decap/Netlify-CMS 官方标准握手——弹窗先 `postMessage('authorizing:github', '*')`，父窗口回发消息后据 `e.origin` 得到父窗口真实 origin，再用该 origin 回发 `authorization:github:success:{token}`；并加 2 秒站点 origin 兜底。提交 `2ff0cd9`（master/develop 同步），**需重新 `wrangler deploy` 生效**。
 
 ## 5. 关键配置现状
 
