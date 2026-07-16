@@ -13,6 +13,37 @@
   }
   var h = React.createElement;
 
+  /* ---------- 自动日期控件 autoDate ----------
+     新闻新建时自动设为今天（YYYY-MM-DD），不可手填，表单中由 CSS 隐藏。
+     仅在值为空时写入今天；已有日期（旧数据）保持不变。 */
+  function todayStr() {
+    var d = new Date();
+    var p = function (n) { return (n < 10 ? "0" : "") + n; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  var AutoDateControl = class extends React.Component {
+    componentDidMount() {
+      if (!this.props.value) this.props.onChange(todayStr());
+    }
+    render() {
+      var v = this.props.value || todayStr();
+      return h(
+        "div",
+        { className: "rw-autodate" },
+        h("span", { className: "rw-autodate__val" }, v),
+        h("span", { className: "rw-autodate__note" }, "（保存时自动设为今天，无需填写）")
+      );
+    }
+  };
+  if (CMS.registerWidget) {
+    CMS.registerWidget(
+      "autoDate",
+      AutoDateControl,
+      function (props) { return h("span", null, props.value || ""); }
+    );
+    console.log("[preview] 自动日期控件 autoDate 已注册");
+  }
+
   /* ---------- 新闻预览 ---------- */
   function NewsPreview(props) {
     var data = props.entry.get("data");

@@ -48,9 +48,9 @@ collections:
                 widget: string
                 hint: "（必填）新闻标题"
               - name: date
-                label: "日期"
-                widget: date
-                hint: "（必填）发布日期，格式 YYYY-MM-DD"
+                label: "发布日期（自动）"
+                widget: autoDate
+                hint: "（自动生成）新建时自动设为今天，无需填写"
               - name: category
                 label: "分类"
                 widget: select
