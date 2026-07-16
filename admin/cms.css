@@ -118,8 +118,5 @@
 .pill--sal { background: #fff4e6; color: #c2630a; }
 
 /* 自动日期字段：编辑器中彻底隐藏（控件仍挂载，会自动写入今天） */
-.nc-field[data-field-name="date"] { display: none !important; }
-/* 控件本身（若因样式未命中而显示，也给低调样式） */
-.rw-autodate { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--rw-muted); }
-.rw-autodate__val { font-weight: 600; color: var(--rw-ink); }
-.rw-autodate__note { font-size: 12px; }
+.nc-field[data-field-name="date"],
+.nc-field:has(.rw-autodate) { display: none !important; }

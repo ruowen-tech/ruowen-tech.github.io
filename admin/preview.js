@@ -26,13 +26,8 @@
       if (!this.props.value) this.props.onChange(todayStr());
     }
     render() {
-      var v = this.props.value || todayStr();
-      return h(
-        "div",
-        { className: "rw-autodate" },
-        h("span", { className: "rw-autodate__val" }, v),
-        h("span", { className: "rw-autodate__note" }, "（保存时自动设为今天，无需填写）")
-      );
+      // 整行由 cms.css 隐藏；此处仅占位，不渲染任何可见文字
+      return h("div", { className: "rw-autodate", style: { display: "none" } });
     }
   };
   if (CMS.registerWidget) {
@@ -123,5 +118,35 @@
   CMS.registerPreviewTemplate("news-data", NewsPreview);
   CMS.registerPreviewTemplate("jobs", JobsPreview);
   CMS.registerPreviewTemplate("jobs-data", JobsPreview);
-  console.log("[preview] 新闻/招聘预览模板已注册");
+  console.log("[preview] 新闻/招聘预览模板与 autoDate 控件已注册");
+
+  /* ---------- 手动初始化（Manual Init） ----------
+     开启 CMS_MANUAL_INIT 后 Decap 不再自动初始化，必须由我们在注册完
+     自定义控件/预览后再 CMS.init()，否则报 "No control for widget 'autoDate'"。
+     UMD 构建下 CMS.init() 不会自动读取 config.yml，故显式 fetch 并解析后传入。 */
+  if (window.CMS_MANUAL_INIT) {
+    var yaml = window.jsyaml;
+    var start = function (config) {
+      CMS.init(config ? { config: config } : undefined);
+    };
+    if (!yaml) {
+      console.error("[preview] jsyaml 未加载，回退让 Decap 自动读取 config.yml");
+      start();
+      return;
+    }
+    fetch("config.yml")
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        try {
+          start(yaml.load(text));
+        } catch (e) {
+          console.error("[preview] 解析 config.yml 失败，回退自动加载", e);
+          start();
+        }
+      })
+      .catch(function (e) {
+        console.error("[preview] 读取 config.yml 失败，回退自动加载", e);
+        start();
+      });
+  }
 })();
