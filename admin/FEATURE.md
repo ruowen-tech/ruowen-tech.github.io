@@ -237,3 +237,32 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 
 ### 经验
 给 Decap 写自定义控件/预览时，**一律用 `window.h` + `window.createClass`，绝不要 `window.React`**。Manual Init + 显式 `CMS.init({config})` 与 `window.jsyaml` 解析 config.yml 的组合保留（自定义控件场景必需）。
+
+## 12. 反复报 "React 未就绪" 的真凶是缓存，不是代码（2026-07-16，提交 0edecb9）
+
+现象：强制刷新后台后仍报 `preview.js:11 [preview] Decap CMS 或 React 未就绪`。
+
+### 诊断
+- `curl https://www.wonderingwall.com/admin/preview.js` 确认**源站代码早已是新版**（含 `window.h`/`window.createClass`，`last-modified` 当天 10:09）。
+- 但响应头 `cache-control: max-age=14400`（**4 小时**）。站点在 Cloudflare 之后，浏览器/CDN 在 4 小时窗口内**一直命中旧版 preview.js**（用 `window.React` 的旧代码），故反复报旧版报错文字。源站代码一直正确。
+
+### 修复
+1. `admin/preview.js`：改为「**轮询就绪**」——若 Decap 全局 API（`window.CMS`/`window.h`/`window.createClass`）未就绪，用 `setTimeout` 每 150ms 重试（最多约 9 秒），就绪才注册控件与预览，杜绝一次性 guard 失败。已确认这些 API 在 decap-cms.js 顶层同步暴露（`window.CMS=r.de,window.createClass=...,window.h=window.h||n.createElement`），无需等 init。
+2. `admin/index.html`：给 `cms.css`/`preview.js` 加 `?v=2` 版本戳破除 CDN/浏览器缓存；`decap-cms@^3.3.3` 锁定为 `decap-cms@3.3.3`（去掉 `^` 避免大版本漂移导致全局 API 变化）。
+
+### 经验（必记）
+GitHub Pages 经 Cloudflare 时，静态资源（`preview.js`/`cms.css`/`config.yml`）缓存长达 4 小时。只要改了后台 JS/CSS/配置，**必须给 URL 加版本戳**（如 `?v=2`），并让用户用「清空缓存并硬性重新加载」（DevTools 右键刷新按钮）或开无痕窗口验证，否则会一直看到旧行为、误以为代码没修好。
+
+## 13. manual init 拉 config 也必须加版本戳（2026-07-16，提交 c289967）
+
+现象：后台报致命 `Config Errors: 'collections' names must be unique`，但线上 `config.yml` 经 `curl` 确认 name 均唯一（news/jobs 无重复，见第 12 节诊断方法）。
+
+### 根因
+仍是 Cloudflare 缓存。旧 `preview.js` 的 manual init 里 `fetch("config.yml")`（**不带版本戳**）命中了 Cloudflare 缓存的旧配置，Decap 校验该旧配置时报错。注意：manual init 模式下 `CMS.init({ config })` 用的 config 来自**我们自己 fetch 的 config.yml**，所以这个 fetch 也必须加版本戳，否则会反复命中旧 config（表现为各类 config 校验错误）。
+
+### 修复
+- `admin/preview.js`：manual init 的 `fetch("config.yml")` → `fetch("config.yml?v=3")`。
+- `admin/index.html`：cms.css / preview.js 版本戳统一 bump 至 `?v=3`。
+
+### 经验
+后台静态资源分两类都要加版本戳防 Cloudflare 缓存：① 直接 `<script>/<link>` 引用的 preview.js / cms.css；② manual init 里 `fetch()` 的 config.yml（它同样走 CDN 缓存）。改动后版本号 +1，并让用户硬清缓存/开无痕验证。
