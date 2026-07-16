@@ -80,6 +80,13 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 - **解决**：移除 6 个公开页面的导航栏与页脚链接（共 12 处），后台仅保留可凭 URL 直接访问（隐藏而非删除）。
 - **进一步加固建议**：在 `decap.wonderingwall.com` 前加 **Cloudflare Access**（指定账号/邮箱才能进），避免固定路径被猜到。
 
+### 问题 5：OAuth 回调 postMessage 死锁 → 无法登录 / 不能增删改内容
+
+- **现象**：打开后台能进入，但点 "Login with GitHub" 后弹窗要么空白、要么授权后不回传，始终进不了内容编辑；即"不能增加、改变内容"。
+- **根因**：`worker/index.js` 的 `/callback` 在换到 `access_token` 后，先 `window.addEventListener("message", receiveMessage)` 等待**父窗口（Decap 弹窗）回发消息**，再 `postMessage` 把 token 交还。但 Decap 的 github 后端弹窗**根本不会**向代理窗口发任何消息——它只被动监听 `authorization:github:success:...`。于是 `receiveMessage` 永不触发，token 永不回传，登录握手卡死。
+- **解决**：把 `/callback` 改成标准 Decap 代理流程——换到 token 后**立即** `window.opener.postMessage("authorization:github:success:" + JSON.stringify({token, provider:"github"}), window.location.origin)`，随后 `window.close()`。不再等待任何父窗口消息。
+- **验证**：`/auth`、`/` 均 302 跳 GitHub（`client_id=Ov23liW90aHanaMyMxPE`、回调 `https://decap.wonderingwall.com/callback`、`scope=public_repo`），`/callback` 无 code 返回 400，符合预期；修复后需重新 `wrangler deploy` 生效（见 `DEPLOY.md`）。
+
 ## 5. 关键配置现状
 
 | 项 | 值 |

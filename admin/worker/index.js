@@ -89,20 +89,22 @@ export default {
       }
 
       // 通过 postMessage 把 token 交还给 Decap 后台弹窗
+      // 关键：Decap 弹窗不会向代理窗口回发任何消息，必须拿到 token 后立即回传并关闭窗口。
+      // 之前此处先 addEventListener('message') 等待父窗口回发，导致 token 永不回传、登录卡死，
+      // 表现为"能打开后台却无法进入/增删改内容"。
       const html = `<!doctype html><html><head><meta charset="utf-8"><title>Authorizing</title></head>
 <body><script>
 (function () {
-  function receiveMessage(e) {
+  try {
     window.opener.postMessage(
       'authorization:github:success:' + JSON.stringify({
         token: ${JSON.stringify(data.access_token)},
         provider: "github"
       }),
-      e.origin
+      window.location.origin
     );
-  }
-  window.addEventListener("message", receiveMessage, false);
-  window.opener.postMessage("authorizing:github", "*");
+  } catch (e) {}
+  window.close();
 })();
 </script></body></html>`;
 
