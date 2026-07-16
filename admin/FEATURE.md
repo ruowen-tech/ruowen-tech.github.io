@@ -220,3 +220,20 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 ### 验证点
 - 后台强刷后应不再出现 "No control" 报错，且编辑/新建新闻时日期行完全不显示。
 - 保存后 `content/news.json` 中该条目的 `date` 为当天日期；右侧预览仍正常显示日期。
+
+## 11. 根因更正：Decap 不暴露 window.React（2026-07-16，提交 af4e172）
+
+第 10 节把 "No control" 归因于注册时机，结论**不准确**。真正根因：
+
+- Decap v3.3.3 的 UMD 构建**只暴露** `window.CMS` / `window.h`(=React.createElement) / `window.createClass`，**不暴露 `window.React`**。
+- 原 preview.js 用 `var React = window.React` → 取到 `undefined` → 守卫 `if (!CMS || !React) return;` 直接退出 → autoDate 控件与预览**从未注册**。这同时解释了 "No control for widget 'autoDate'" 与 "Decap CMS 或 React 未就绪"。
+- 第 10 节的 manual init 改动本身没错（自定义控件确实需要先注册再 init），但即使时序对了，只要还在用 `window.React` 就必然失败。
+
+### 正确写法（已落地于 af4e172）
+- `var h = window.h;`（即 React.createElement）
+- 控件类用 `window.createClass({ componentDidMount, render })`（createReactClass API），不再用 `class extends React.Component`。
+- 守卫改为 `if (!CMS || !h || !createClass) return;`
+- 预览组件仍是普通函数返回 `h(...)`，无需 React.Component。
+
+### 经验
+给 Decap 写自定义控件/预览时，**一律用 `window.h` + `window.createClass`，绝不要 `window.React`**。Manual Init + 显式 `CMS.init({config})` 与 `window.jsyaml` 解析 config.yml 的组合保留（自定义控件场景必需）。
