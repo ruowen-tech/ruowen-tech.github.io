@@ -8,16 +8,15 @@
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg" />
 </head>
 <body>
-  <!-- 关键：开启 Manual Init，确保自定义控件/预览在 CMS 初始化前注册，
-       避免 "No control for widget 'autoDate'"；初始化由 preview.js 显式调用。 -->
-  <script>window.CMS_MANUAL_INIT = true;</script>
-  <!-- Decap CMS（锁定大版本，避免 ^ 导致全局 API 漂移）；会自动读取同目录下的 config.yml -->
+  <!-- Decap CMS（锁定大版本，避免 ^ 导致全局 API 漂移）。
+       加载后异步读取同目录下的 config.yml 自动初始化。
+       自定义控件 autoDate 与预览模板由 preview.js 同步注册，
+       早于 Decap 异步 init，故无需 Manual Init（手动 fetch config 会触发
+       "collections names must be unique" 之类校验问题）。 -->
   <script src="https://unpkg.com/decap-cms@3.3.3/dist/decap-cms.js"></script>
   <!-- 后台美化样式（置于脚本之后，确保覆盖 Decap 默认样式）。?v 用于破除 CDN/浏览器缓存 -->
-  <link rel="stylesheet" href="cms.css?v=2" />
-  <!-- js-yaml：用于 manual init 时解析 config.yml -->
-  <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
-  <!-- 实时预览模板 + autoDate 控件（须在 decap-cms.js / js-yaml 之后加载）。?v 破除缓存 -->
-  <script src="preview.js?v=3"></script>
+  <link rel="stylesheet" href="cms.css?v=3" />
+  <!-- 实时预览模板 + autoDate 控件（须在 decap-cms.js 之后加载）。?v 破除缓存 -->
+  <script src="preview.js?v=4"></script>
 </body>
 </html>

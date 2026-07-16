@@ -129,35 +129,11 @@
     CMS.registerPreviewTemplate("jobs-data", JobsPreview);
     console.log("[preview] 新闻/招聘预览模板与 autoDate 控件已注册");
 
-    /* ---------- 手动初始化（Manual Init） ----------
-       开启 CMS_MANUAL_INIT 后 Decap 不再自动初始化，必须由我们在注册完
-       自定义控件/预览后再 CMS.init()，否则会报 "No control for widget 'autoDate'"。
-       UMD 构建下 CMS.init() 不会自动读取 config.yml，故显式 fetch 并解析后传入。 */
-    if (window.CMS_MANUAL_INIT) {
-      var yaml = window.jsyaml;
-      var start = function (config) {
-        CMS.init(config ? { config: config } : undefined);
-      };
-      if (!yaml) {
-        console.error("[preview] jsyaml 未加载，回退让 Decap 自动读取 config.yml");
-        start();
-        return;
-      }
-      fetch("config.yml?v=3")
-        .then(function (r) { return r.text(); })
-        .then(function (text) {
-          try {
-            start(yaml.load(text));
-          } catch (e) {
-            console.error("[preview] 解析 config.yml 失败，回退自动加载", e);
-            start();
-          }
-        })
-        .catch(function (e) {
-          console.error("[preview] 读取 config.yml 失败，回退自动加载", e);
-          start();
-        });
-    }
+    /* ---------- 无需 Manual Init ----------
+       decap-cms.js 加载后并不会同步初始化，而是异步读取同目录 config.yml 再 init；
+       本脚本在其后同步执行，控件/预览已注册完毕，早于 Decap 的异步 init，
+       因此不会出现 "No control"；也避免了手动 fetch config 导致的
+       "collections names must be unique" 等校验问题。 */
   }
 
   /* 轮询等待 Decap 全局 API 就绪（最多约 9 秒），就绪即注册，杜绝一次性失败 */
