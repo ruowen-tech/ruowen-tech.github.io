@@ -143,7 +143,7 @@
         start();
         return;
       }
-      fetch("config.yml")
+      fetch("config.yml?v=3")
         .then(function (r) { return r.text(); })
         .then(function (text) {
           try {
