@@ -1,17 +1,19 @@
 /* =========================================================
    上海若紊科技 · Decap CMS 预览模板（实时渲染，免等部署）
    - 必须在 decap-cms.js 之后加载（admin/index.html 已按顺序引入）
-   - 编辑新闻/招聘时，右侧预览区即时渲染成与官网一致的卡片样式
+   - 重要：Decap 仅暴露 window.CMS / window.h(=React.createElement) /
+     window.createClass，并不暴露 window.React。故此处一律用 h 与
+     createClass 编写组件，不可使用 window.React。
    ========================================================= */
 (function () {
   "use strict";
   var CMS = window.CMS;
-  var React = window.React;
-  if (!CMS || !React) {
-    console.error("[preview] Decap CMS 或 React 未就绪，预览模板未注册");
+  var h = window.h;
+  var createClass = window.createClass;
+  if (!CMS || !h || !createClass) {
+    console.error("[preview] Decap CMS / h / createClass 未就绪，预览模板未注册");
     return;
   }
-  var h = React.createElement;
 
   /* ---------- 自动日期控件 autoDate ----------
      新闻新建时自动设为今天（YYYY-MM-DD），不可手填，表单中由 CSS 隐藏。
@@ -21,15 +23,16 @@
     var p = function (n) { return (n < 10 ? "0" : "") + n; };
     return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
   }
-  var AutoDateControl = class extends React.Component {
-    componentDidMount() {
+  var AutoDateControl = createClass({
+    componentDidMount: function () {
       if (!this.props.value) this.props.onChange(todayStr());
-    }
-    render() {
+    },
+    render: function () {
       // 整行由 cms.css 隐藏；此处仅占位，不渲染任何可见文字
       return h("div", { className: "rw-autodate", style: { display: "none" } });
     }
-  };
+  });
+
   if (CMS.registerWidget) {
     CMS.registerWidget(
       "autoDate",
@@ -122,7 +125,7 @@
 
   /* ---------- 手动初始化（Manual Init） ----------
      开启 CMS_MANUAL_INIT 后 Decap 不再自动初始化，必须由我们在注册完
-     自定义控件/预览后再 CMS.init()，否则报 "No control for widget 'autoDate'"。
+     自定义控件/预览后再 CMS.init()，否则会报 "No control for widget 'autoDate'"。
      UMD 构建下 CMS.init() 不会自动读取 config.yml，故显式 fetch 并解析后传入。 */
   if (window.CMS_MANUAL_INIT) {
     var yaml = window.jsyaml;
