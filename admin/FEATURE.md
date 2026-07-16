@@ -202,3 +202,21 @@ Decap CMS 的 `github` 后端在登录时需要一个**服务端 OAuth 回调端
 ### 注意
 - 后台静态资源（index.html / cms.css / preview.js / config.yml）由 GitHub Pages 托管于 `www.wonderingwall.com/admin/`，**改动需等一次 GitHub Pages 重建**才会生效（仅此一次，之后预览即时）。
 - 预览组件依赖 `window.React`（Decap 已内置），若控制台报 "React 未就绪" 说明脚本加载顺序异常。
+
+## 10. autoDate 控件 "No control" 修复（2026-07-16，提交 8a8a116）
+
+现象：新闻编辑页日期字段报 `No control for widget 'autoDate'`，且用户要求该字段（含提示）整行不显示。
+
+### 根因
+`admin/index.html` 中 `decap-cms.js` 为同步脚本，加载后**立即自动初始化** CMS；`preview.js` 在其后才执行去注册 `autoDate` 控件，已错过注册时机 → Decap 找不到控件报 "No control"。同时该字段的标签与提示文案仍按 config 显示，不符合"完全不展示"的需求。
+
+### 修复
+1. `admin/index.html`：在 decap-cms.js 之前加 `<script>window.CMS_MANUAL_INIT = true;</script>`，关闭自动初始化；引入 js-yaml（unpkg）用于解析 config。
+2. `admin/preview.js`：注册完控件与预览后，显式 `fetch('config.yml')` → `jsyaml.load` → `CMS.init({ config })`。注意 UMD 构建下 `CMS.init()` 不会自动读 config.yml，必须显式传入，否则后台打不开。
+3. `autoDate` 控件：`componentDidMount` 中若值为空则写入当天 `YYYY-MM-DD`（旧数据日期不变）；`render` 改为渲染不可见空 div，不再有任何"自动生成"文字。
+4. `admin/cms.css`：`.nc-field[data-field-name="date"]` 与 `.nc-field:has(.rw-autodate)` 双保险 `display:none !important`，整行（标签+提示）一并隐藏。
+5. `admin/config.yml`：日期字段移除 hint，label 简化（已隐藏不影响）。
+
+### 验证点
+- 后台强刷后应不再出现 "No control" 报错，且编辑/新建新闻时日期行完全不显示。
+- 保存后 `content/news.json` 中该条目的 `date` 为当天日期；右侧预览仍正常显示日期。
